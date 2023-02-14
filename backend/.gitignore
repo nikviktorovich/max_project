@@ -1,3 +1,4 @@
 # Python Virtual Environment
 venv
 __pycache__
+*.db
