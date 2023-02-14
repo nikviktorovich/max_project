@@ -1,9 +1,13 @@
 import fastapi
 import fastapi.middleware.cors
+import database
+import models
 
+models.Base.metadata.create_all(bind=database.engine)
 
 app = fastapi.FastAPI()
 
+# CORS configuration
 origins = [
     'http://localhost:*',
 ]
@@ -15,3 +19,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+
+# Routes
+...
