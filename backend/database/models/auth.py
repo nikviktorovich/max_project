@@ -6,7 +6,7 @@ from sqlalchemy import Table
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from ..database import Base
+from .. import Base
 
 
 # Many-to-many relationship of groups assigned to individual users
@@ -40,7 +40,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(150), unique=True)
     full_name: Mapped[Optional[str]] = mapped_column(String(255))
-    password: Mapped[str]
+    password: Mapped[str] = mapped_column(String(255))
     groups: Mapped[List['Group']] = relationship(secondary=user_groups)
     permissions: Mapped[List['Permission']] = relationship(secondary=user_permissions)
 
