@@ -38,6 +38,14 @@ app.add_middleware(
 )
 
 
+def get_db():
+    db = database.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 # Routes
 @app.get('/')
 async def get_index(token: str = Depends(oauth2_scheme)):
