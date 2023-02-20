@@ -20,8 +20,11 @@ class Product(Base):
     description: Mapped[str]
     stock: Mapped[int]
     price_rub: Mapped[float]
-    added: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
-    last_updated: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now())
+    is_active: Mapped[bool] = mapped_column(default=True)
+    added: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now())
+    last_updated: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), onupdate=func.now())
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     owner: Mapped['User'] = relationship()
     images: Mapped[List['ProductImage']] = relationship(back_populates='product')
