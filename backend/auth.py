@@ -4,6 +4,7 @@ import passlib.context
 import schemas
 from typing import Any, Dict, Optional
 from jose import jwt
+from sqlalchemy.orm import Session
 from database import SessionLocal
 from database import crud
 from database import models
@@ -30,9 +31,11 @@ def hash_password(password: str) -> str:
     return _pwd_context.hash(password)
 
 
-def authenticate_user(username: str, password: str) -> Optional[models.User]:
-    with SessionLocal() as db:
-        user = crud.get_user_by_username(db, username)
+def authenticate_user(db: Session,
+                      username: str,
+                      password: str
+                      ) -> Optional[models.User]:
+    user = crud.get_user_by_username(db, username)
     
     if user is None:
         return None
@@ -65,8 +68,8 @@ def decode_token(token: str) -> Dict[str, Any]:
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
 
-def login(username: str, password: str) -> Optional[schemas.Token]:
-    user = authenticate_user(username, password)
+def login(db: Session, username: str, password: str) -> Optional[schemas.Token]:
+    user = authenticate_user(db, username, password)
     if user is None:
         return None
     access_token_expires = datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -77,7 +80,7 @@ def login(username: str, password: str) -> Optional[schemas.Token]:
     return schemas.Token(access_token=access_token, token_type='bearer')
 
 
-def register_user(user: schemas.User) -> schemas.Token:
+def register_user(db: Session, user: schemas.User) -> schemas.Token:
     hashed_password = hash_password(user.password)
     with SessionLocal() as db:
         if not crud.is_username_available(db, user.username):
@@ -91,7 +94,7 @@ def register_user(user: schemas.User) -> schemas.Token:
         db.add(user_db)
         db.commit()
     
-    token = login(user.username, user.password)
+    token = login(db, user.username, user.password)
     
     if token is None:
         logger.error(f'User "{user.username}" has been registered but not logged in')

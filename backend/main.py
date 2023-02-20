@@ -53,13 +53,14 @@ async def get_index(token: str = Depends(oauth2_scheme)):
 
 
 @app.post('/token')
-async def login(form_data: security.OAuth2PasswordRequestForm = Depends()):
+async def login(form_data: security.OAuth2PasswordRequestForm = Depends(),
+                db: Session = Depends(get_db)):
     """
     Returns:
         access_token
         token_type
     """
-    login_result = auth.login(form_data.username, form_data.password)
+    login_result = auth.login(db, form_data.username, form_data.password)
     if login_result is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -70,14 +71,15 @@ async def login(form_data: security.OAuth2PasswordRequestForm = Depends()):
 
 
 def register_user(user_data: schemas.UserData = Depends(schemas.UserData),
-                  form_data: security.OAuth2PasswordRequestForm = Depends()):
+                  form_data: security.OAuth2PasswordRequestForm = Depends(),
+                  db: Session = Depends(get_db)):
     try:
         user = schemas.User(
             full_name=user_data.full_name,
             username=form_data.username,
             password=form_data.password,
         )
-        token = auth.register_user(user)
+        token = auth.register_user(db, user)
     except pydantic.ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
