@@ -2,3 +2,10 @@ from .auth import Token
 from .auth import UserCreate
 from .auth import UserRead
 from .auth import User
+from .media import Image
+from .product import ProductCreate
+from .product import ProductRead
+from .product import Product
+from .product import ProductImageCreate
+from .product import ProductImageRead
+from .product import ProductImage

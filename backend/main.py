@@ -100,3 +100,12 @@ async def signup(token: schemas.Token = Depends(register_user)):
     """
     
     return token
+
+
+@app.get('/products')
+def get_products(
+    offset: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    return crud.get_products(db, offset, limit)
