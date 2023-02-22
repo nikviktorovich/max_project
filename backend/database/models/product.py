@@ -36,5 +36,5 @@ class ProductImage(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id'))
     product: Mapped['Product'] = relationship(back_populates='images')
-    image_id: Mapped[int] = mapped_column(ForeignKey('images.id'))
+    image_id: Mapped[int] = mapped_column(ForeignKey('images.id'), unique=True)
     image: Mapped['Image'] = relationship()
