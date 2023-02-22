@@ -1,13 +1,13 @@
 import datetime
 import logging
 import passlib.context
-import schemas
 from typing import Any, Dict, Optional
 from jose import jwt
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from database import crud
 from database import models
+from database import schemas
 
 
 logger = logging.getLogger(__name__)
@@ -80,19 +80,19 @@ def login(db: Session, username: str, password: str) -> Optional[schemas.Token]:
     return schemas.Token(access_token=access_token, token_type='bearer')
 
 
-def register_user(db: Session, user: schemas.User) -> schemas.Token:
+def register_user(db: Session, user: schemas.UserCreate) -> schemas.Token:
     hashed_password = hash_password(user.password)
-    with SessionLocal() as db:
-        if not crud.is_username_available(db, user.username):
-            raise ValueError('Username is already taken')
-        
-        user_db = models.User(
-            username=user.username,
-            password=hashed_password,
-            full_name=user.full_name,
-        )
-        db.add(user_db)
-        db.commit()
+    
+    if not crud.is_username_available(db, user.username):
+        raise ValueError('Username is already taken')
+    
+    user_db = models.User(
+        username=user.username,
+        password=hashed_password,
+        full_name=user.full_name,
+    )
+    db.add(user_db)
+    db.commit()
     
     token = login(db, user.username, user.password)
     

@@ -3,7 +3,6 @@ import jose
 import pydantic
 import auth
 import database
-import schemas
 from typing import Optional
 from fastapi import Body
 from fastapi import Depends
@@ -16,6 +15,7 @@ from jose import jwt
 from sqlalchemy.orm import Session
 from database import crud
 from database import models
+from database import schemas
 
 database.Base.metadata.create_all(bind=database.engine)
 
@@ -70,11 +70,11 @@ async def login(form_data: security.OAuth2PasswordRequestForm = Depends(),
     return login_result
 
 
-def register_user(user_data: schemas.UserData = Depends(schemas.UserData),
+def register_user(user_data: schemas.UserCreate = Depends(schemas.UserCreate),
                   form_data: security.OAuth2PasswordRequestForm = Depends(),
                   db: Session = Depends(get_db)):
     try:
-        user = schemas.User(
+        user = schemas.UserCreate(
             full_name=user_data.full_name,
             username=form_data.username,
             password=form_data.password,
