@@ -1,21 +1,26 @@
 from typing import List, Optional
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from .. import models
 
 
 def get_products(db: Session, offset: int, limit: int) -> List[models.Product]:
-    query = db.query(models.Product).offset(offset).limit(limit)
-    return query.all()
+    """Returns list of all products"""
+    query = select(models.Product).limit(limit).offset(offset)
+    return list(db.scalars(query).all())
 
 
 def get_product_by_id(db: Session, product_id: int) -> Optional[models.Product]:
-    query = db.query(models.Product).filter_by(id=product_id)
-    return query.first()
+    """Returns product with the specified id"""
+    query = select(models.Product).where(models.Product.id == product_id)
+    return db.scalars(query).first()
 
 
 def get_product_image_by_id(
     db: Session,
     product_image_id: int
 ) -> Optional[models.ProductImage]:
-    query = db.query(models.ProductImage).filter_by(id=product_image_id)
-    return query.first()
+    """Returns product image with the specified id"""
+    query = select(models.ProductImage) \
+        .where(models.ProductImage.id == product_image_id)
+    return db.scalars(query).first()
