@@ -1,9 +1,7 @@
 import fastapi.exceptions
-import jose
 import pydantic
 import auth
 import database
-from typing import Optional
 from fastapi import Body
 from fastapi import Depends
 from fastapi import FastAPI
@@ -11,10 +9,8 @@ from fastapi import HTTPException
 from fastapi import security
 from fastapi import status
 from fastapi.middleware import cors
-from jose import jwt
 from sqlalchemy.orm import Session
 from database import crud
-from database import models
 from database import schemas
 
 database.Base.metadata.create_all(bind=database.engine)
@@ -53,8 +49,10 @@ async def get_index(token: str = Depends(oauth2_scheme)):
 
 
 @app.post('/token')
-async def login(form_data: security.OAuth2PasswordRequestForm = Depends(),
-                db: Session = Depends(get_db)):
+async def login(
+    form_data: security.OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
     """
     Returns:
         access_token
@@ -70,9 +68,11 @@ async def login(form_data: security.OAuth2PasswordRequestForm = Depends(),
     return login_result
 
 
-def register_user(user_data: schemas.UserCreate = Depends(schemas.UserCreate),
-                  form_data: security.OAuth2PasswordRequestForm = Depends(),
-                  db: Session = Depends(get_db)):
+def register_user(
+    user_data: schemas.UserCreate = Depends(schemas.UserCreate),
+    form_data: security.OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
     try:
         user = schemas.UserCreate(
             full_name=user_data.full_name,

@@ -31,10 +31,11 @@ def hash_password(password: str) -> str:
     return _pwd_context.hash(password)
 
 
-def authenticate_user(db: Session,
-                      username: str,
-                      password: str
-                      ) -> Optional[models.User]:
+def authenticate_user(
+    db: Session,
+    username: str,
+    password: str,
+) -> Optional[models.User]:
     user = crud.get_user_by_username(db, username)
     
     if user is None:
@@ -46,9 +47,10 @@ def authenticate_user(db: Session,
     return user
 
 
-def create_access_token(data: dict,
-                        expires_delta: Optional[datetime.timedelta] = None,
-                        ) -> str:
+def create_access_token(
+    data: dict,
+    expires_delta: Optional[datetime.timedelta] = None,
+) -> str:
     if expires_delta is None:
         expires_delta = datetime.timedelta(minutes=15)
     
