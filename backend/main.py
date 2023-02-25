@@ -2,9 +2,11 @@ import fastapi.exceptions
 import pydantic
 import auth
 import database
+from typing import Optional
 from fastapi import Body
 from fastapi import Depends
 from fastapi import FastAPI
+from fastapi import Form
 from fastapi import HTTPException
 from fastapi import security
 from fastapi import status
@@ -68,18 +70,25 @@ async def login(
     return login_result
 
 
+def get_user_create_form_data(
+    username: str = Body(),
+    password: str = Body(),
+    full_name: str = Body(default=''),
+) -> schemas.UserCreate:
+    return schemas.UserCreate(
+        username=username,
+        full_name=full_name,
+        password=password
+    )
+
+
 def register_user(
-    user_data: schemas.UserCreate = Depends(schemas.UserCreate),
+    user_data: schemas.UserCreate = Depends(get_user_create_form_data),
     form_data: security.OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
     try:
-        user = schemas.UserCreate(
-            full_name=user_data.full_name,
-            username=form_data.username,
-            password=form_data.password,
-        )
-        token = auth.register_user(db, user)
+        token = auth.register_user(db, user_data)
     except pydantic.ValidationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

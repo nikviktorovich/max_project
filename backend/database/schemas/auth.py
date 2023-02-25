@@ -9,7 +9,7 @@ class Token(pydantic.BaseModel):
 
 class UserBase(pydantic.BaseModel):
     username: str
-    full_name: Optional[str]
+    full_name: str = ''
     
     @pydantic.validator('username')
     def username_valid_length(cls, v):
