@@ -75,11 +75,17 @@ def get_user_create_form_data(
     password: str = Body(),
     full_name: str = Body(default=''),
 ) -> schemas.UserCreate:
-    return schemas.UserCreate(
-        username=username,
-        full_name=full_name,
-        password=password
-    )
+    try:
+        return schemas.UserCreate(
+            username=username,
+            full_name=full_name,
+            password=password
+        )
+    except pydantic.ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.errors()
+        )
 
 
 def register_user(
@@ -89,11 +95,6 @@ def register_user(
 ):
     try:
         token = auth.register_user(db, user_data)
-    except pydantic.ValidationError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=e.errors()
-        )
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
