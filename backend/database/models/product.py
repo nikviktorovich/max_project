@@ -22,9 +22,14 @@ class Product(Base):
     price_rub: Mapped[float]
     is_active: Mapped[bool] = mapped_column(default=True)
     added: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now())
+        DateTime(timezone=True),
+        default=func.now()
+    )
     last_updated: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), onupdate=func.now())
+        DateTime(timezone=True),
+        default=func.now(),
+        onupdate=func.now()
+    )
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     owner: Mapped['User'] = relationship()
     images: Mapped[List['ProductImage']] = relationship(back_populates='product')
