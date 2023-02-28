@@ -2,7 +2,7 @@ import fastapi.exceptions
 import pydantic
 import auth
 import database
-from typing import Optional
+from typing import List, Optional
 from fastapi import Body
 from fastapi import Depends
 from fastapi import FastAPI
@@ -112,7 +112,7 @@ async def signup(token: schemas.Token = Depends(register_user)):
     return token
 
 
-@app.get('/products')
+@app.get('/products', response_model=List[schemas.ProductRead])
 def get_products(
     offset: int = 0,
     limit: int = 100,

@@ -6,6 +6,26 @@ from . import User
 from . import UserRead
 
 
+class ProductImageBase(pydantic.BaseModel):
+    pass
+
+
+class ProductImageCreate(ProductImageBase):
+    image_id: int
+
+
+class ProductImage(ProductImageBase):
+    id: int
+    image: 'Image'
+    
+    class Config:
+        orm_mode=True
+
+
+class ProductImageRead(ProductImage):
+    pass
+
+
 class ProductBase(pydantic.BaseModel):
     title: str
     description: str
@@ -33,6 +53,9 @@ class ProductRead(ProductBase):
     last_updated: datetime
     owner: UserRead
     images: List['ProductImage']
+    
+    class Config:
+        orm_mode=True
 
 
 class Product(ProductBase):
@@ -44,21 +67,3 @@ class Product(ProductBase):
     
     class Config:
         orm_mode = True
-
-
-class ProductImageBase(pydantic.BaseModel):
-    pass
-
-
-class ProductImageCreate(ProductImageBase):
-    image_id: int
-
-
-class ProductImage(ProductImageBase):
-    id: int
-    product: 'Product'
-    image: 'Image'
-
-
-class ProductImageRead(ProductImage):
-    pass

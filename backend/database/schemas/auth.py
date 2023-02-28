@@ -35,6 +35,9 @@ class UserCreate(UserBase):
 class UserRead(UserBase):
     pass
 
+    class Config:
+        orm_mode=True
+
 
 class User(UserCreate):
     id: int
