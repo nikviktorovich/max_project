@@ -6,6 +6,7 @@ import database
 import main
 from fastapi import status
 from fastapi.testclient import TestClient
+from database import models
 
 
 SQLALCHEMY_DATABASE_URL = 'sqlite:///./test_market_app.db'
@@ -39,6 +40,43 @@ class TestAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         database.Base.metadata.create_all(bind=engine)
+        cls.fill_db(cls)
+    
+    def fill_db(self) -> None:
+        with TestingSessionLocal() as db:
+            # Adding 2 test users
+            test_user_1 = models.User(
+                username='testuser1',
+                password='testuser1',
+                full_name='Some Test User',
+            )
+            test_user_2 = models.User(
+                username='testuser2',
+                password='testuser2',
+                full_name='Another Test User'
+            )
+            users = [test_user_1, test_user_2]
+            db.add_all(users)
+            
+            # Adding 2 test products
+            test_product_1 = models.Product(
+                title='Some test product',
+                description='',
+                stock=10,
+                price_rub=1000,
+                owner=test_user_1,
+            )
+            test_product_2 = models.Product(
+                title='Another test product',
+                description='',
+                stock=0,
+                price_rub=100,
+                owner=test_user_2,
+            )
+            products = [test_product_1, test_product_2]
+            db.add_all(products)
+            
+            db.commit()
     
     @classmethod
     def tearDownClass(cls) -> None:
@@ -82,3 +120,9 @@ class TestAPI(unittest.TestCase):
         headers = {'Authorization': f'Bearer {token["access_token"]}'}
         response = client.get('/', headers=headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_products_list(self):
+        # Testing getting products list
+        response = client.get('/products')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.json())
