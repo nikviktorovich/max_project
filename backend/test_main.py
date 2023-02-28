@@ -36,10 +36,12 @@ client = TestClient(main.app)
 
 
 class TestAPI(unittest.TestCase):
-    def setUp(self) -> None:
+    @classmethod
+    def setUpClass(cls) -> None:
         database.Base.metadata.create_all(bind=engine)
     
-    def tearDown(self) -> None:
+    @classmethod
+    def tearDownClass(cls) -> None:
         database.Base.metadata.drop_all(bind=engine)
     
     def test_permissions(self):
