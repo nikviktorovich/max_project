@@ -32,7 +32,10 @@ class Product(Base):
     )
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     owner: Mapped['User'] = relationship()
-    images: Mapped[List['ProductImage']] = relationship(back_populates='product')
+    images: Mapped[List['ProductImage']] = relationship(
+        back_populates='product',
+        cascade="all, delete-orphan"
+    )
 
 
 class ProductImage(Base):
