@@ -3,6 +3,7 @@ import os
 import os.path
 import fastapi.exceptions
 import pydantic
+import sqlalchemy.exc
 import auth
 import database
 from typing import List, Optional
@@ -201,3 +202,40 @@ def save_image(
 )
 def add_image(image: models.Image = Depends(save_image)):
     return image
+
+
+@app.post(
+    '/products/{product_id}/addImage',
+    response_model=schemas.ProductImageRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_product_image(
+    product_id: int,
+    image: schemas.ProductImageCreate,
+    db: Session = Depends(get_db),
+):
+    product = crud.get_product_by_id(db, product_id)
+
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail='Unable to find a product with the specified id',
+        )
+    
+    image = crud.get_image_by_id(db, image.image_id)
+
+    if image is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail='Unable to find an image with the specified id',
+        )
+    
+    try:
+        product_image = crud.add_product_image(db, product, image)
+    except sqlalchemy.exc.IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Unable to add this image to the product',
+        )
+
+    return product_image

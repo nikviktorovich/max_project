@@ -2,6 +2,7 @@ import pydantic
 from datetime import datetime
 from typing import List
 from . import Image
+from . import ImageRead
 from . import User
 from . import UserRead
 
@@ -13,17 +14,22 @@ class ProductImageBase(pydantic.BaseModel):
 class ProductImageCreate(ProductImageBase):
     image_id: int
 
+    class Config:
+        orm_mode = True
 
-class ProductImage(ProductImageBase):
+
+class ProductImageRead(ProductImageBase):
     id: int
-    image: 'Image'
+    product_id: int
+    image: 'ImageRead'
     
     class Config:
         orm_mode=True
 
 
-class ProductImageRead(ProductImage):
-    pass
+class ProductImage(ProductImageRead):
+    class Config:
+        orm_mode = True
 
 
 class ProductBase(pydantic.BaseModel):
@@ -53,7 +59,7 @@ class ProductRead(ProductBase):
     added: datetime
     last_updated: datetime
     owner: UserRead
-    images: List['ProductImage']
+    images: List['ProductImageRead']
     
     class Config:
         orm_mode=True

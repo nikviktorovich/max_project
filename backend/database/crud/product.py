@@ -24,3 +24,17 @@ def get_product_image_by_id(
     query = select(models.ProductImage) \
         .where(models.ProductImage.id == product_image_id)
     return db.scalars(query).first()
+
+
+def add_product_image(
+    db: Session,
+    product: models.Product,
+    image: models.Image
+) -> Optional[models.ProductImage]:
+    product_image = models.ProductImage(
+        product=product,
+        image=image,
+    )
+    db.add(product_image)
+    db.commit()
+    return product_image
