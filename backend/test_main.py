@@ -141,3 +141,18 @@ class TestAPI(unittest.TestCase):
         # Checking for the image presence
         response = client.get(f'/images/{image_id}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_add_product_image(self):
+        response = client.get('/products')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        products = response.json()
+        product_id = products[0]['id']
+
+        with open('./test_content/test_image_1.png', 'rb') as f:
+            response = client.post('/images', files={'image_file': f})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        image_id = response.json()['id']
+
+        payload = {'image_id': image_id}
+        response = client.post(f'/products/{product_id}/addImage', json=payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
