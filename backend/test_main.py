@@ -126,3 +126,18 @@ class TestAPI(unittest.TestCase):
         response = client.get('/products')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.json())
+    
+    def test_image_upload(self):
+        # No upload file presented
+        response = client.post('/image')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Uploading a valid file
+        with open('./test_content/test_image_1.png', 'rb') as f:
+            response = client.post('/images', files={'image_file': f})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        image_id = response.json()['id']
+
+        # Checking for the image presence
+        response = client.get(f'/images/{image_id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
