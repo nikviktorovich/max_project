@@ -1,3 +1,4 @@
+import logging
 import fastapi.exceptions
 import pydantic
 import auth
@@ -14,6 +15,9 @@ from fastapi.middleware import cors
 from sqlalchemy.orm import Session
 from database import crud
 from database import schemas
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
 
 database.Base.metadata.create_all(bind=database.engine)
 
