@@ -49,6 +49,7 @@ class ProductCreate(ProductBase):
 
 
 class ProductRead(ProductBase):
+    id: int
     added: datetime
     last_updated: datetime
     owner: UserRead
