@@ -1,26 +1,31 @@
 import logging
+import os
+import os.path
 import fastapi.exceptions
 import pydantic
 import auth
 import database
 from typing import List, Optional
+from uuid import uuid4
 from fastapi import Body
 from fastapi import Depends
 from fastapi import FastAPI
+from fastapi import File
 from fastapi import Form
 from fastapi import HTTPException
+from fastapi import UploadFile
 from fastapi import security
 from fastapi import status
 from fastapi.middleware import cors
 from sqlalchemy.orm import Session
 from database import crud
+from database import models
 from database import schemas
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
 database.Base.metadata.create_all(bind=database.engine)
-
 
 oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl='token')
 
@@ -123,3 +128,76 @@ def get_products(
     db: Session = Depends(get_db)
 ):
     return crud.get_products(db, offset, limit)
+
+
+@app.get('/images/{image_id}', response_model=schemas.ImageRead)
+def get_image(image_id: int, db: Session = Depends(get_db)):
+    image = crud.get_image_by_id(db, image_id)
+    if image is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Unable to find an image with the specified id',
+        )
+    return image
+
+
+def get_available_media_filename(media_path: str, media_filename: str) -> str:
+    """Checks if media file name is available and returns the original
+    file name if it is and generates a unique one otherwise
+
+    Returns:
+        Available media file name
+    """
+    new_media_filename = media_filename
+
+    while os.path.exists(os.path.join(media_path, new_media_filename)):
+        new_media_filename = f'{uuid4().hex}_{media_filename}'
+    
+    return new_media_filename
+
+
+def write_image(image_file: UploadFile) -> str:
+    """Writes uploaded image into a file in a media folder"""
+    media_path = os.getenv('MEDIA_PATH')
+    
+    if media_path is None:
+        raise RuntimeError('MEDIA_PATH is not specified')
+    
+    # We need image to name to at least have an information
+    # about it's extension
+    if image_file.filename is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail='Image name is not specified',
+        )
+    
+    # Saving image into media folder
+    image_filename = get_available_media_filename(media_path, image_file.filename)
+    image_path = os.path.join(media_path, image_filename)
+    try:
+        image_contents = image_file.file.read()
+        with open(image_path, 'wb') as f:
+            f.write(image_contents)
+    except IOError as e:
+        logging.error(f'Error adding an image: {str(e)} (filename: {e.filename})')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Unable to add the image',
+        )
+    return image_filename
+
+
+def save_image(
+    image_filename: str = Depends(write_image),
+    db: Session = Depends(get_db)
+) -> models.Image:
+    image = crud.create_image(db, image_filename)
+    return image
+
+@app.post(
+    '/images',
+    response_model=schemas.ImageRead,
+    status_code=status.HTTP_201_CREATED
+)
+def add_image(image: models.Image = Depends(save_image)):
+    return image

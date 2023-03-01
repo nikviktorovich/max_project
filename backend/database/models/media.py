@@ -7,4 +7,4 @@ class Image(Base):
     __tablename__ = 'images'
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    media_path: Mapped[str]
+    image_path: Mapped[str]
