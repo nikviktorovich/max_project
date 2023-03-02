@@ -5,5 +5,6 @@ from .media import get_image_by_id
 from .media import create_image
 from .product import get_product_by_id
 from .product import get_products
+from .product import add_product
 from .product import get_product_image_by_id
 from .product import add_product_image

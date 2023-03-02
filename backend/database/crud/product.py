@@ -2,6 +2,7 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from .. import models
+from .. import schemas
 
 
 def get_products(db: Session, offset: int, limit: int) -> List[models.Product]:
@@ -14,6 +15,17 @@ def get_product_by_id(db: Session, product_id: int) -> Optional[models.Product]:
     """Returns product with the specified id"""
     query = select(models.Product).where(models.Product.id == product_id)
     return db.scalars(query).first()
+
+
+def add_product(
+    db: Session,
+    product: schemas.ProductCreate,
+    owner: models.User,
+) -> Optional[models.Product]:
+    product_model = models.Product(**product.dict(), owner=owner, images=[])
+    db.add(product_model)
+    db.commit()
+    return product_model
 
 
 def get_product_image_by_id(

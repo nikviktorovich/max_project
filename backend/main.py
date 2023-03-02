@@ -143,6 +143,29 @@ def get_user(
         )
     return user
 
+
+@app.post(
+    '/products',
+    response_model=schemas.ProductRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_product(
+    product: schemas.ProductCreate,
+    owner: models.User = Depends(get_user),
+    db: Session = Depends(get_db),
+):
+    product_model = crud.add_product(db, product, owner)
+    if product_model is None:
+        logger.error(
+            f'Failed adding product. User: {owner.username}, Product: {product}'
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Unable to add product',
+        )
+    return product_model
+
+
 @app.get('/images/{image_id}', response_model=schemas.ImageRead)
 def get_image(image_id: int, db: Session = Depends(get_db)):
     image = crud.get_image_by_id(db, image_id)

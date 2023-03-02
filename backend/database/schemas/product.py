@@ -34,15 +34,13 @@ class ProductImage(ProductImageRead):
 
 class ProductBase(pydantic.BaseModel):
     title: str
-    description: str
+    description: str = ''
     stock: int
     price_rub: float
-    is_active: bool
+    is_active: bool = True
 
 
 class ProductCreate(ProductBase):
-    images: List[int]
-    
     @pydantic.validator('title')
     def title_valid_length(cls, v):
         if len(v) < 8:
