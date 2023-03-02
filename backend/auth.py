@@ -82,6 +82,17 @@ def login(db: Session, username: str, password: str) -> Optional[schemas.Token]:
     return schemas.Token(access_token=access_token, token_type='bearer')
 
 
+def get_user(db: Session, token: str) -> Optional[models.User]:
+    """Reads the token and returns the corresponding user
+    Reads the token and returns the corresponding user. If user is not active
+    or token is expired (not implemented for simplicity) None is returned.
+    """
+    decoded_data = decode_token(token)
+    username = decoded_data['sub']
+    user = crud.get_user_by_username(db, username)
+    return user
+
+
 def register_user(db: Session, user: schemas.UserCreate) -> schemas.Token:
     hashed_password = hash_password(user.password)
     

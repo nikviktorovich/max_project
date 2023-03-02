@@ -131,6 +131,18 @@ def get_products(
     return crud.get_products(db, offset, limit)
 
 
+def get_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+) -> models.User:
+    user = auth.get_user(db, token)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='You are not authorized or your account is not active',
+        )
+    return user
+
 @app.get('/images/{image_id}', response_model=schemas.ImageRead)
 def get_image(image_id: int, db: Session = Depends(get_db)):
     image = crud.get_image_by_id(db, image_id)
