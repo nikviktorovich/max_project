@@ -2,11 +2,14 @@ import unittest
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
+import auth
 import database
 import main
 from fastapi import status
 from fastapi.testclient import TestClient
+from database import crud
 from database import models
+from database import schemas
 
 
 SQLALCHEMY_DATABASE_URL = 'sqlite:///./test_market_app.db'
@@ -45,18 +48,21 @@ class TestAPI(unittest.TestCase):
     def fill_db(self) -> None:
         with TestingSessionLocal() as db:
             # Adding 2 test users
-            test_user_1 = models.User(
+            users = [
+                schemas.UserCreate(
                 username='testuser1',
                 password='testuser1',
                 full_name='Some Test User',
-            )
-            test_user_2 = models.User(
+                ),
+                schemas.UserCreate(
                 username='testuser2',
                 password='testuser2',
                 full_name='Another Test User'
             )
-            users = [test_user_1, test_user_2]
-            db.add_all(users)
+            ]
+            for user in users:
+                auth.register_user(db, user)
+            
             
             # Adding 2 test products
             test_product_1 = models.Product(
@@ -64,14 +70,14 @@ class TestAPI(unittest.TestCase):
                 description='',
                 stock=10,
                 price_rub=1000,
-                owner=test_user_1,
+                owner=crud.get_user_by_username(db, 'testuser1'),
             )
             test_product_2 = models.Product(
                 title='Another test product',
                 description='',
                 stock=0,
                 price_rub=100,
-                owner=test_user_2,
+                owner=crud.get_user_by_username(db, 'testuser2'),
             )
             products = [test_product_1, test_product_2]
             db.add_all(products)
