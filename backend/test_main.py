@@ -50,15 +50,15 @@ class TestAPI(unittest.TestCase):
             # Adding 2 test users
             users = [
                 schemas.UserCreate(
-                username='testuser1',
-                password='testuser1',
-                full_name='Some Test User',
+                    username='testuser1',
+                    password='testuser1',
+                    full_name='Some Test User',
                 ),
                 schemas.UserCreate(
-                username='testuser2',
-                password='testuser2',
-                full_name='Another Test User'
-            )
+                    username='testuser2',
+                    password='testuser2',
+                    full_name='Another Test User'
+                )
             ]
             for user in users:
                 auth.register_user(db, user)
@@ -132,6 +132,37 @@ class TestAPI(unittest.TestCase):
         response = client.get('/products')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.json())
+
+    def test_add_product(self):
+        product_payload = {
+            'title': 'Some title',
+            'stock': 10,
+            'price_rub': 100,
+        }
+
+        # Testing adding a product being unauthorized
+        response = client.post('products', json=product_payload)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Logging in
+        login_data = {
+            'username': 'testuser1',
+            'password': 'testuser1'
+        }
+        response = client.post('/token', data=login_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token = response.json()
+        
+        # Successful calling index while being authorized
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
+        response = client.post('/products', headers=headers, json=product_payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        added_product = response.json()
+
+        # Testing adding a product
+        response = client.get(f'/products')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(added_product, response.json())
     
     def test_image_upload(self):
         # No upload file presented
