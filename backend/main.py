@@ -166,6 +166,17 @@ def add_product(
     return product_model
 
 
+@app.get('/products/{product_id}', response_model=schemas.ProductRead)
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    product_model = crud.get_product_by_id(db, product_id)
+    if product_model is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Unable to find a product with the specified id',
+        )
+    return product_model
+
+
 @app.get('/images/{image_id}', response_model=schemas.ImageRead)
 def get_image(image_id: int, db: Session = Depends(get_db)):
     image = crud.get_image_by_id(db, image_id)

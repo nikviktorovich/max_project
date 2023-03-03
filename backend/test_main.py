@@ -132,6 +132,11 @@ class TestAPI(unittest.TestCase):
         response = client.get('/products')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.json())
+    
+    def test_product_detail(self):
+        # Getting product with id 1, added during setup stage
+        response = client.get('/products/1')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_add_product(self):
         product_payload = {
