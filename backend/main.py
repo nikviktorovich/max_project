@@ -302,3 +302,20 @@ def add_product_image(
         )
 
     return product_image
+
+
+@app.patch('/user', response_model=schemas.UserRead)
+def patch_username(
+    user_patch: schemas.UserFullnameUpdate,
+    user: models.User = Depends(get_user),
+    db: Session = Depends(get_db)
+):
+    patched_user = crud.patch_user_fullname(db, user.id, user_patch)
+
+    if patched_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='You need to authorize first',
+        )
+    
+    return patched_user

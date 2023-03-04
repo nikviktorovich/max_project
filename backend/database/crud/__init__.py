@@ -1,6 +1,7 @@
 from .auth import get_user
 from .auth import get_user_by_username
 from .auth import is_username_available
+from .auth import patch_user_fullname
 from .media import get_image_by_id
 from .media import create_image
 from .product import get_product_by_id
