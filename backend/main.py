@@ -177,6 +177,23 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
     return product_model
 
 
+@app.patch('/products/{product_id}', response_model=schemas.ProductRead)
+def patch_product(
+    product_id: int,
+    product_patch: schemas.ProductUpdate,
+    db: Session = Depends(get_db)
+):
+    patched_product = crud.patch_product(db, product_id, product_patch)
+
+    if patched_product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Unable to find a product with the specified id',
+        )
+    
+    return patched_product
+
+
 @app.get('/images/{image_id}', response_model=schemas.ImageRead)
 def get_image(image_id: int, db: Session = Depends(get_db)):
     image = crud.get_image_by_id(db, image_id)
