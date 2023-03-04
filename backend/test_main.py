@@ -198,3 +198,29 @@ class TestAPI(unittest.TestCase):
         payload = {'image_id': image_id}
         response = client.post(f'/products/{product_id}/addImage', json=payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    
+    def test_patch_product(self):
+        # Getting any random first test product
+        response = client.get('/products')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        products = response.json()
+        test_product = products[0]
+
+        # Adding stock count
+        product_stock = test_product['stock']
+        patch_data = {
+            'stock': product_stock + 1,
+        }
+
+        # Patching product record
+        product_id = test_product['id']
+        response = client.patch(f'/products/{product_id}', json=patch_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Checking if patch is applied
+        patched_product = response.json()
+        self.assertEqual(patched_product['stock'], product_stock + 1)
+
+        response = client.get(f'/products/{product_id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), patched_product)
