@@ -224,3 +224,26 @@ class TestAPI(unittest.TestCase):
         response = client.get(f'/products/{product_id}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), patched_product)
+    
+    def test_patch_user_fullname(self):
+        # Trying to patch while not authorized
+        response = client.patch('/user', json={
+            'full_name': 'New Full Name',
+        })
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Logging in
+        response = client.post('/token', data={
+            'username': 'testuser1',
+            'password': 'testuser1',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token = response.json()
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
+
+        # Patching users full name
+        response = client.patch('/user', headers=headers, json={
+            'full_name': 'New Full Name',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['full_name'], 'New Full Name')
