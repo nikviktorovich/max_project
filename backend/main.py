@@ -181,8 +181,30 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
 def patch_product(
     product_id: int,
     product_patch: schemas.ProductUpdate,
+    user: models.User = Depends(get_user),
     db: Session = Depends(get_db)
 ):
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='You are not authorized',
+        )
+    
+    product = crud.get_product_by_id(db, product_id)
+
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Unable to find a product with the specified id',
+        )
+    
+    # Check if user is an owner of this product
+    if user.id != product.owner_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Insufficient permissions',
+        )
+
     patched_product = crud.patch_product(db, product_id, product_patch)
 
     if patched_product is None:

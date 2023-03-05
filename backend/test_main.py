@@ -200,7 +200,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     
     def test_patch_product(self):
-        # Getting any random first test product
+        # Getting the first test product
         response = client.get('/products')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         products = response.json()
@@ -212,9 +212,22 @@ class TestAPI(unittest.TestCase):
             'stock': product_stock + 1,
         }
 
+        # Logging in
+        response = client.post('/token', data={
+            'username': 'testuser1',
+            'password': 'testuser1',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token = response.json()
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
+
         # Patching product record
         product_id = test_product['id']
-        response = client.patch(f'/products/{product_id}', json=patch_data)
+        response = client.patch(
+            f'/products/{product_id}',
+            headers=headers,
+            json=patch_data,
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Checking if patch is applied
