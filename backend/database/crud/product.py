@@ -46,6 +46,23 @@ def patch_product(
     return product_model
 
 
+def put_product(
+    db: Session,
+    product_id: int,
+    product: schemas.ProductPut,
+) -> Optional[models.Product]:
+    product_model = get_product_by_id(db, product_id)
+
+    if product_model is None:
+        return None
+
+    for key, value in product.dict().items():
+        setattr(product_model, key, value)
+    
+    db.commit()
+    return product_model
+
+
 def get_product_image_by_id(
     db: Session,
     product_image_id: int

@@ -9,6 +9,7 @@ from .media import Image
 from .product import ProductCreate
 from .product import ProductRead
 from .product import ProductUpdate
+from .product import ProductPut
 from .product import Product
 from .product import ProductImageCreate
 from .product import ProductImageRead

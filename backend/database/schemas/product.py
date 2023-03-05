@@ -81,6 +81,10 @@ class ProductUpdate(pydantic.BaseModel):
         return v
 
 
+class ProductPut(ProductCreate):
+    pass
+
+
 class Product(ProductBase):
     id: int
     added: datetime

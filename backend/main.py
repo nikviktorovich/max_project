@@ -194,6 +194,45 @@ def patch_product(
     return patched_product
 
 
+@app.put('/products/{product_id}', response_model=schemas.ProductRead)
+def put_product(
+    product_id: int,
+    product_put: schemas.ProductPut,
+    user: models.User = Depends(get_user),
+    db: Session = Depends(get_db)
+):
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='You are not authorized',
+        )
+    
+    product = crud.get_product_by_id(db, product_id)
+
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Unable to find a product with the specified id',
+        )
+    
+    # Check if user is an owner of this product
+    if user.id != product.owner_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Insufficient permissions',
+        )
+
+    updated_product = crud.put_product(db, product_id, product_put)
+
+    if updated_product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Unable to find a product with the specified id',
+        )
+    
+    return updated_product
+
+
 @app.get('/images/{image_id}', response_model=schemas.ImageRead)
 def get_image(image_id: int, db: Session = Depends(get_db)):
     image = crud.get_image_by_id(db, image_id)
