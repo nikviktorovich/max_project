@@ -277,6 +277,35 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), updated_product)
     
+    def test_delete_product(self):
+        # Logging in
+        response = client.post('/token', data={
+            'username': 'testuser1',
+            'password': 'testuser1',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token = response.json()
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
+
+        # Adding a product
+        response = client.post('/products', headers=headers, json={
+            'title': 'Some title',
+            'description': 'Some test product',
+            'stock': 15,
+            'price_rub': 13.37,
+            'is_active': True,
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        product = response.json()
+
+        # Deleting the product
+        response = client.delete(f'/products/{product["id"]}', headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Checking that product does not exist anymore
+        response = client.get(f'/products/{product["id"]}')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
     def test_patch_user_fullname(self):
         # Trying to patch while not authorized
         response = client.patch('/user', json={
