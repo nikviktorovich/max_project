@@ -38,6 +38,9 @@ app.add_middleware(
 
 
 # Routes
+
+# Auth
+
 @app.get('/')
 async def get_index(token: str = Depends(auth.oauth2_scheme)):
     return {'token': token}
@@ -70,6 +73,44 @@ async def signup(token: schemas.Token = Depends(deps.register_user)):
     
     return token
 
+
+# User
+
+@app.patch('/user', response_model=schemas.UserRead)
+def patch_username(
+    user_patch: schemas.UserFullnameUpdate,
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db)
+):
+    patched_user = crud.patch_user_fullname(db, user.id, user_patch)
+
+    if patched_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='You need to authorize first',
+        )
+    
+    return patched_user
+
+
+@app.put('/user', response_model=schemas.UserRead)
+def put_username(
+    user_put: schemas.UserFullnamePut,
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db)
+):
+    updated_user = crud.put_user_fullname(db, user.id, user_put)
+
+    if updated_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='You need to authorize first',
+        )
+    
+    return updated_user
+
+
+# Products
 
 @app.get('/products', response_model=List[schemas.ProductRead])
 def get_products(
@@ -191,6 +232,8 @@ def put_product(
     return updated_product
 
 
+# Image and product image
+
 @app.get('/images/{image_id}', response_model=schemas.ImageRead)
 def get_image(image_id: int, db: Session = Depends(deps.get_db)):
     image = crud.get_image_by_id(db, image_id)
@@ -246,37 +289,3 @@ def add_product_image(
         )
 
     return product_image
-
-
-@app.patch('/user', response_model=schemas.UserRead)
-def patch_username(
-    user_patch: schemas.UserFullnameUpdate,
-    user: models.User = Depends(deps.get_user),
-    db: Session = Depends(deps.get_db)
-):
-    patched_user = crud.patch_user_fullname(db, user.id, user_patch)
-
-    if patched_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='You need to authorize first',
-        )
-    
-    return patched_user
-
-
-@app.put('/user', response_model=schemas.UserRead)
-def put_username(
-    user_put: schemas.UserFullnamePut,
-    user: models.User = Depends(deps.get_user),
-    db: Session = Depends(deps.get_db)
-):
-    updated_user = crud.put_user_fullname(db, user.id, user_put)
-
-    if updated_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='You need to authorize first',
-        )
-    
-    return updated_user
