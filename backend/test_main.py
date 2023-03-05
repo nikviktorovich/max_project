@@ -4,6 +4,7 @@ import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 import auth
 import database
+import deps
 import main
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -34,7 +35,7 @@ def get_test_db():
         db.close()
 
 
-main.app.dependency_overrides[main.get_db] = get_test_db
+main.app.dependency_overrides[deps.get_db] = get_test_db
 
 client = TestClient(main.app)
 

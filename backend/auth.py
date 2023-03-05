@@ -2,9 +2,9 @@ import datetime
 import logging
 import passlib.context
 from typing import Any, Dict, Optional
+from fastapi import security
 from jose import jwt
 from sqlalchemy.orm import Session
-from database import SessionLocal
 from database import crud
 from database import models
 from database import schemas
@@ -21,6 +21,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 _pwd_context = passlib.context.CryptContext(schemes=['bcrypt'], deprecated='auto')
+oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl='token')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
