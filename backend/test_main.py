@@ -247,3 +247,26 @@ class TestAPI(unittest.TestCase):
         })
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['full_name'], 'New Full Name')
+    
+    def test_put_user_fullname(self):
+        # Trying to put while not authorized
+        response = client.put('/user', json={
+            'full_name': 'New Full Name',
+        })
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Logging in
+        response = client.post('/token', data={
+            'username': 'testuser1',
+            'password': 'testuser1',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token = response.json()
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
+
+        # Putting users full name
+        response = client.put('/user', headers=headers, json={
+            'full_name': 'New Full Name',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['full_name'], 'New Full Name')
