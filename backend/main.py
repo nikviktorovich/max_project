@@ -232,6 +232,37 @@ def put_product(
     return updated_product
 
 
+@app.delete('/products/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_product(
+    product_id: int,
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db)
+):
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='You are not authorized',
+        )
+    
+    product = crud.get_product_by_id(db, product_id)
+
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Unable to find a product with the specified id',
+        )
+    
+    # Check if user is an owner of this product
+    if user.id != product.owner_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Insufficient permissions',
+        )
+    
+    crud.delete_product(db, product_id)
+    return
+
+
 # Image and product image
 
 @app.get('/images/{image_id}', response_model=schemas.ImageRead)

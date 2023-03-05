@@ -10,5 +10,6 @@ from .product import get_products
 from .product import add_product
 from .product import patch_product
 from .product import put_product
+from .product import delete_product
 from .product import get_product_image_by_id
 from .product import add_product_image

@@ -1,4 +1,5 @@
 from typing import List, Optional
+from sqlalchemy import delete
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from .. import models
@@ -61,6 +62,12 @@ def put_product(
     
     db.commit()
     return product_model
+
+
+def delete_product(db: Session, product_id: int) -> None:
+    query = delete(models.Product).where(models.Product.id == product_id)
+    db.execute(query)
+    db.commit()
 
 
 def get_product_image_by_id(
