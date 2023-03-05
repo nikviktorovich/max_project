@@ -225,6 +225,44 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), patched_product)
     
+    def test_put_product(self):
+        # Getting the first test product
+        response = client.get('/products')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        products = response.json()
+        test_product = products[0]
+
+        # Adding stock count
+        product_stock = test_product['stock']
+        put_data = test_product.copy()
+        put_data['stock'] += 1
+
+        # Logging in
+        response = client.post('/token', data={
+            'username': 'testuser1',
+            'password': 'testuser1',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token = response.json()
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
+
+        # Patching product record
+        product_id = test_product['id']
+        response = client.put(
+            f'/products/{product_id}',
+            headers=headers,
+            json=put_data,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Checking if patch is applied
+        updated_product = response.json()
+        self.assertEqual(updated_product['stock'], product_stock + 1)
+
+        response = client.get(f'/products/{product_id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), updated_product)
+    
     def test_patch_user_fullname(self):
         # Trying to patch while not authorized
         response = client.patch('/user', json={
