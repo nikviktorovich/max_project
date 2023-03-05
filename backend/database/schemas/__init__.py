@@ -3,6 +3,7 @@ from .auth import UserCreate
 from .auth import UserRead
 from .auth import User
 from .auth import UserFullnameUpdate
+from .auth import UserFullnamePut
 from .media import ImageRead
 from .media import Image
 from .product import ProductCreate

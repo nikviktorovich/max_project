@@ -319,3 +319,20 @@ def patch_username(
         )
     
     return patched_user
+
+
+@app.put('/user', response_model=schemas.UserRead)
+def put_username(
+    user_put: schemas.UserFullnamePut,
+    user: models.User = Depends(get_user),
+    db: Session = Depends(get_db)
+):
+    updated_user = crud.put_user_fullname(db, user.id, user_put)
+
+    if updated_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='You need to authorize first',
+        )
+    
+    return updated_user

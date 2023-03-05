@@ -39,3 +39,20 @@ def patch_user_fullname(
     
     db.commit()
     return user
+
+
+def put_user_fullname(
+    db: Session,
+    user_id: int,
+    user_put: schemas.UserFullnamePut,
+):
+    user = get_user(db, user_id)
+
+    if user is None:
+        return None
+    
+    for key, value in user_put.dict().items():
+        setattr(user, key, value)
+    
+    db.commit()
+    return user
