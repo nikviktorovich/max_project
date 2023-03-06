@@ -351,3 +351,58 @@ class TestAPI(unittest.TestCase):
         })
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['full_name'], 'New Full Name')
+    
+    def test_cart(self):
+        # Trying to get cart while being unauthorized
+        response = client.get('/cart')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Logging in
+        response = client.post('/token', data={
+            'username': 'testuser1',
+            'password': 'testuser1',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token = response.json()
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
+
+        # Adding a product to cart
+        response = client.get('/products')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        products = response.json()
+        test_product = products[0]
+
+        response = client.post('/cart', headers=headers, json={
+            'product_id': test_product['id'],
+            'amount': 10,
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Checking if cart has the product now
+        response = client.get('/cart', headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        cart_items = response.json()
+        self.assertEqual(cart_items[0]['product_id'], test_product['id'])
+
+        # Changing the amount of product in cart
+        response = client.put(
+            f'/cart/{test_product["id"]}',
+            headers=headers,
+            json={'product_id': test_product['id'], 'amount': 10},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Checking if the amount of item in cart has been changed
+        response = client.get('/cart', headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        cart_items = response.json()
+        self.assertEqual(cart_items[0]['amount'], 10)
+
+        # Removing the item from cart
+        response = client.delete(f'/cart/{test_product["id"]}', headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+        # Checking if item has been sucessfully removed
+        response = client.get('/cart', headers=headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()), 0)
