@@ -161,12 +161,6 @@ def patch_product(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='You are not authorized',
-        )
-    
     product = crud.get_product_by_id(db, product_id)
 
     if product is None:
@@ -200,12 +194,6 @@ def put_product(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='You are not authorized',
-        )
-    
     product = crud.get_product_by_id(db, product_id)
 
     if product is None:
@@ -238,12 +226,6 @@ def delete_product(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='You are not authorized',
-        )
-    
     product = crud.get_product_by_id(db, product_id)
 
     if product is None:
