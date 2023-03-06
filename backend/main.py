@@ -302,3 +302,74 @@ def add_product_image(
         )
 
     return product_image
+
+
+@app.get('/cart', response_model=List[schemas.CartItemRead])
+def get_cart_items(
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db),
+):
+    return crud.get_cart_items(db, user.id)
+
+
+@app.post(
+    '/cart',
+    response_model=schemas.CartItemRead,
+    status_code=status.HTTP_201_CREATED
+)
+def add_cart_item(
+    cart_item: schemas.CartItemCreate,
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db),
+):
+    cart_item_internal = schemas.CartItemCreateInternal(
+        **cart_item.dict(),
+        user_id=user.id
+    )
+    added_item = crud.add_cart_item(db, cart_item_internal)
+    
+    if added_item is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Unable to add this product to your cart',
+        )
+    
+    return added_item
+
+
+@app.put('/cart/{product_id}', response_model=schemas.CartItemRead)
+def put_cart_item(
+    product_id: int,
+    cart_item: schemas.CartItemUpdate,
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db),
+):
+    cart_item_internal = schemas.CartItemUpdateInternal(
+        **cart_item.dict(),
+        product_id=product_id,
+        user_id=user.id,
+    )
+    updated_item = crud.put_cart_item(db, cart_item_internal)
+    
+    if updated_item is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Unable to update the item',
+        )
+    
+    return updated_item
+
+
+@app.delete('/cart/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_cart_item(
+    product_id: int,
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db),
+):
+    cart_item_internal = schemas.CartItemDelete(
+        product_id=product_id,
+        user_id=user.id,
+    )
+
+    crud.delete_cart_item(db, cart_item_internal)
+    return
