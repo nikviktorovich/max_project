@@ -35,6 +35,15 @@ def _make_product_images(
     return product_images
 
 
+def _delete_product_images(db: Session, product: models.Product) -> None:
+    prev_images = product.images
+    prev_image_ids = [prev_image.id for prev_image in prev_images]
+    remove_images_query = delete(models.ProductImage).where(
+        models.ProductImage.id.in_(prev_image_ids)
+    )
+    db.execute(remove_images_query)
+
+
 def add_product(
     db: Session,
     product: schemas.ProductCreate,
@@ -74,6 +83,7 @@ def patch_product(
         setattr(product_model, key, value)
     
     if product.images:
+        _delete_product_images(db, product_model)
         product_model.images = _make_product_images(db, product.images)
     
     db.commit()
@@ -97,6 +107,7 @@ def put_product(
         setattr(product_model, key, value)
     
     if product.images:
+        _delete_product_images(db, product_model)
         product_model.images = _make_product_images(db, product.images)
     
     db.commit()
