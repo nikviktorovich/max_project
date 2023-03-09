@@ -187,19 +187,38 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_add_product_image(self):
-        response = client.get('/products')
+        # Logging in
+        login_data = {
+            'username': 'testuser1',
+            'password': 'testuser1',
+        }
+        response = client.post('/token', data=login_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        products = response.json()
-        product_id = products[0]['id']
+        token = response.json()
+        headers = {'Authorization': f'Bearer {token["access_token"]}'}
 
-        with open('./test_content/test_image_1.png', 'rb') as f:
-            response = client.post('/images', files={'image_file': f})
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        image_id = response.json()['id']
+        # Uploading 2 images
+        image_ids = []
+        for _ in range(2):
+            with open('./test_content/test_image_1.png', 'rb') as f:
+                response = client.post('/images', files={'image_file': f})
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            image_id = response.json()['id']
+            image_ids.append(image_id)
 
-        payload = {'image_id': image_id}
-        response = client.post(f'/products/{product_id}/addImage', json=payload)
+        # Adding a product with the images
+        response = client.post('/products', headers=headers, json={
+            'title': 'Some product with images',
+            'stock': 100,
+            'price_rub': 100.0,
+            'images': image_ids,
+        })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product = response.json()
+        self.assertTrue(
+            all(pimg['image']['id'] in image_ids for pimg in product['images'])
+        )
     
     def test_patch_product(self):
         # Getting the first test product
