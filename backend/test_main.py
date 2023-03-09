@@ -43,6 +43,7 @@ client = TestClient(main.app)
 class TestAPI(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        database.Base.metadata.drop_all(bind=engine)
         database.Base.metadata.create_all(bind=engine)
         cls.fill_db(cls)
     
