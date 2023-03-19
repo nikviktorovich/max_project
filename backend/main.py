@@ -300,6 +300,15 @@ def add_cart_item(
     return added_item
 
 
+@app.get('/cart/{product_id}', response_model=schemas.CartItemRead)
+def get_cart_item(
+    product_id: int,
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db),
+):
+    return crud.get_cart_item(db, user.id, product_id)
+
+
 @app.put('/cart/{product_id}', response_model=schemas.CartItemRead)
 def put_cart_item(
     product_id: int,

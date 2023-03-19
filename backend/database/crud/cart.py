@@ -8,7 +8,7 @@ from .. import models
 from .. import schemas
 
 
-def _get_cart_item(
+def get_cart_item(
     db: Session,
     user_id: int,
     product_id: int
@@ -42,7 +42,7 @@ def put_cart_item(
     db: Session,
     item: schemas.CartItemUpdateInternal
 ) -> Optional[models.CartItem]:
-    item_model = _get_cart_item(db, item.user_id, item.product_id)
+    item_model = get_cart_item(db, item.user_id, item.product_id)
     
     if item_model is None:
         return None
