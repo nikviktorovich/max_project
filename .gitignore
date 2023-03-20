@@ -1,1 +1,12 @@
+# Editor-specific
 .vscode/
+
+# Python Virtual Environment
+venv
+.venv
+__pycache__
+*.db
+
+# Tests
+.env
+.pytest_cache/

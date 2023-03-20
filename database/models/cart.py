@@ -10,13 +10,13 @@ from .. import Base
 
 class CartItem(Base):
     __tablename__ = 'cartitems'
-    __table_args__ = [
+    __table_args__ = (
         UniqueConstraint(
             'product_id',
             'user_id',
             name='user_product_unique_constraint',
         ),
-    ]
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     amount: Mapped[int] = mapped_column()

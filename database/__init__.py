@@ -1,5 +1,4 @@
 import sqlalchemy
-import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
 
@@ -17,4 +16,4 @@ SessionLocal = sqlalchemy.orm.sessionmaker(
     autoflush=False
 )
 
-Base = sqlalchemy.ext.declarative.declarative_base()
+Base = sqlalchemy.orm.declarative_base()
