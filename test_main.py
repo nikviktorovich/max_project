@@ -198,24 +198,28 @@ class TestAPI(unittest.TestCase):
         headers = {'Authorization': f'Bearer {token["access_token"]}'}
 
         # Uploading 2 images
-        image_ids = []
+        images = []
         for _ in range(2):
             with open('./test_content/test_image_1.png', 'rb') as f:
                 response = client.post('/images', files={'image_file': f})
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
             image_id = response.json()['id']
-            image_ids.append(image_id)
+            image = {
+                'image_id': image_id
+            }
+            images.append(image)
 
         # Adding a product with the images
         response = client.post('/products', headers=headers, json={
             'title': 'Some product with images',
             'stock': 100,
             'price_rub': 100.0,
-            'images': image_ids,
+            'images': images,
         })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         product = response.json()
+        image_ids = [image['image_id'] for image in images]
         self.assertTrue(
             all(pimg['image']['id'] in image_ids for pimg in product['images'])
         )

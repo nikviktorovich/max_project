@@ -55,7 +55,8 @@ def add_product(
     product_model = models.Product(**product_dict, owner=owner)
 
     if product.images:
-        product_model.images = _make_product_images(db, product.images)
+        image_ids = [image.image_id for image in product.images]
+        product_model.images = _make_product_images(db, image_ids)
 
     db.add(product_model)
     db.commit()
@@ -84,7 +85,8 @@ def patch_product(
     
     if product.images:
         _delete_product_images(db, product_model)
-        product_model.images = _make_product_images(db, product.images)
+        image_ids = [image.image_id for image in product.images]
+        product_model.images = _make_product_images(db, image_ids)
     
     db.commit()
     return product_model
@@ -108,7 +110,8 @@ def put_product(
     
     if product.images:
         _delete_product_images(db, product_model)
-        product_model.images = _make_product_images(db, product.images)
+        image_ids = [image.image_id for image in product.images]
+        product_model.images = _make_product_images(db, image_ids)
     
     db.commit()
     return product_model

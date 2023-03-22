@@ -40,7 +40,7 @@ class ProductBase(pydantic.BaseModel):
 
 
 class ProductCreate(ProductBase):
-    images: List[int] = [] # List of image ids
+    images: List[ProductImageCreate] = [] # List of image ids
 
     @pydantic.validator('title')
     def title_valid_length(cls, v):
@@ -70,7 +70,7 @@ class ProductUpdate(pydantic.BaseModel):
     stock: Optional[int] = None
     price_rub: Optional[float] = None
     is_active: Optional[bool] = None
-    images: Optional[List[int]] = None
+    images: Optional[List[ProductImageCreate]] = None
 
     @pydantic.validator('title')
     def title_valid_length(cls, v):
