@@ -12,7 +12,7 @@ def get_image_by_id(db: Session, image_id: int) -> Optional[models.Image]:
 
 
 def create_image(db: Session, image_path: str) -> models.Image:
-    image = models.Image(image_path=image_path)
+    image = models.Image(image=image_path)
     db.add(image)
     db.commit()
     return image

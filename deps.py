@@ -87,7 +87,7 @@ def get_available_media_filename(media_path: str, media_filename: str) -> str:
     return new_media_filename
 
 
-def write_image(image_file: UploadFile) -> str:
+def write_image(image: UploadFile) -> str:
     """Writes uploaded image into a file in a media folder"""
     media_path = os.getenv('MEDIA_PATH')
     
@@ -96,17 +96,17 @@ def write_image(image_file: UploadFile) -> str:
     
     # We need image to name to at least have an information
     # about it's extension
-    if image_file.filename is None:
+    if image.filename is None:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail='Image name is not specified',
         )
     
     # Saving image into media folder
-    image_filename = get_available_media_filename(media_path, image_file.filename)
+    image_filename = get_available_media_filename(media_path, image.filename)
     image_path = os.path.join(media_path, image_filename)
     try:
-        image_contents = image_file.file.read()
+        image_contents = image.file.read()
         with open(image_path, 'wb') as f:
             f.write(image_contents)
     except IOError as e:

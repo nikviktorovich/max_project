@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 
 
 class ImageBase(pydantic.BaseModel):
-    image_path: str
+    image: str
 
 
 class ImageCreate(ImageBase):
@@ -14,7 +14,7 @@ class ImageCreate(ImageBase):
 class ImageRead(ImageBase):
     id: int
 
-    @pydantic.validator('image_path')
+    @pydantic.validator('image')
     def adjust_media_path(cls, v):
         """Making URL to reach the image"""
         media_url_root = os.getenv('MEDIA_URL_ROOT')
