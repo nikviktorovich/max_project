@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi import security
 from fastapi import status
+from fastapi import responses
 from fastapi.middleware import cors
 from sqlalchemy.orm import Session
 from database import crud
@@ -35,6 +36,24 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+
+@app.exception_handler(Exception)
+def global_exception_handler(request, exception):
+    message = f"Failed to execute: {request.method}: {request.url}. Error: {exception}"
+    logger.error(message)
+    return responses.JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={'detail': 'Server error'}
+    )
+
+
+@app.exception_handler(ValueError)
+def value_error_handler(request, exception):
+    return responses.JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={'detail': str(exception)},
+    )
 
 
 # Routes
