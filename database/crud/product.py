@@ -36,12 +36,20 @@ def _make_product_images(
 
 
 def _delete_product_images(db: Session, product: models.Product) -> None:
-    prev_images = product.images
-    prev_image_ids = [prev_image.id for prev_image in prev_images]
     remove_images_query = delete(models.ProductImage).where(
-        models.ProductImage.id.in_(prev_image_ids)
+        models.ProductImage.product == product
     )
     db.execute(remove_images_query)
+
+
+def _check_images_collision(db: Session, image_ids: List[int]) -> None:
+    query = select(models.ProductImage).where(
+        models.ProductImage.image_id.in_(image_ids)
+    )
+    existing_product_images = db.scalars(query).all()
+
+    if existing_product_images:
+        raise ValueError('Some of the images are already bound to a product')
 
 
 def add_product(
@@ -56,6 +64,7 @@ def add_product(
 
     if product.images:
         image_ids = [image.image_id for image in product.images]
+        _check_images_collision(db, image_ids)
         product_model.images = _make_product_images(db, image_ids)
 
     db.add(product_model)
@@ -85,7 +94,9 @@ def patch_product(
     
     if product.images:
         _delete_product_images(db, product_model)
+        
         image_ids = [image.image_id for image in product.images]
+        _check_images_collision(db, image_ids)
         product_model.images = _make_product_images(db, image_ids)
     
     db.commit()
@@ -98,19 +109,21 @@ def put_product(
     product: schemas.ProductPut,
 ) -> Optional[models.Product]:
     product_dict = product.dict()
-    product_dict['images'] = []
+    del product_dict['images']
 
     product_model = get_product_by_id(db, product_id)
 
     if product_model is None:
         return None
 
-    for key, value in product.dict().items():
+    for key, value in product_dict.items():
         setattr(product_model, key, value)
     
+    _delete_product_images(db, product_model)
+    
     if product.images:
-        _delete_product_images(db, product_model)
         image_ids = [image.image_id for image in product.images]
+        _check_images_collision(db, image_ids)
         product_model.images = _make_product_images(db, image_ids)
     
     db.commit()
