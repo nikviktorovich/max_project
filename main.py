@@ -78,9 +78,7 @@ async def login(
 
 @app.post('/signup', response_model=schemas.Token)
 async def signup(token: schemas.Token = Depends(deps.register_user)):
-    """
-    """
-    
+    """Allows user to sign up and returns an access token."""
     return token
 
 
@@ -91,6 +89,7 @@ def get_user(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db),
 ):
+    """Returns information of the authorized user"""
     return user
 
 
@@ -100,6 +99,7 @@ def patch_username(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
+    """Allows to edit (PATCH) the authorized user's information"""
     patched_user = crud.patch_user_fullname(db, user.id, user_patch)
 
     if patched_user is None:
@@ -117,6 +117,7 @@ def put_username(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
+    """Allows to edit (PUT) the authorized user's information"""
     updated_user = crud.put_user_fullname(db, user.id, user_put)
 
     if updated_user is None:
@@ -136,6 +137,7 @@ def get_products(
     limit: int = 100,
     db: Session = Depends(deps.get_db)
 ):
+    """Returns a list of products"""
     return crud.get_products(db, offset, limit)
 
 
@@ -149,6 +151,7 @@ def add_product(
     owner: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db),
 ):
+    """Adds a product"""
     product_model = crud.add_product(db, product, owner)
     if product_model is None:
         logger.error(
@@ -163,6 +166,7 @@ def add_product(
 
 @app.get('/products/{product_id}', response_model=schemas.ProductRead)
 def get_product(product_id: int, db: Session = Depends(deps.get_db)):
+    """Returns information of specified product"""
     product_model = crud.get_product_by_id(db, product_id)
     if product_model is None:
         raise HTTPException(
@@ -179,6 +183,7 @@ def patch_product(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
+    """Allows to edit (PATCH) specified product's info"""
     product = crud.get_product_by_id(db, product_id)
 
     if product is None:
@@ -212,6 +217,7 @@ def put_product(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
+    """Allows to edit (PUT) specified product's info"""
     product = crud.get_product_by_id(db, product_id)
 
     if product is None:
@@ -244,6 +250,7 @@ def delete_product(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
+    """Deletes specified product"""
     product = crud.get_product_by_id(db, product_id)
 
     if product is None:
@@ -267,6 +274,7 @@ def delete_product(
 
 @app.get('/images/{image_id}', response_model=schemas.ImageRead)
 def get_image(image_id: int, db: Session = Depends(deps.get_db)):
+    """Returns information of specified image"""
     image = crud.get_image_by_id(db, image_id)
     if image is None:
         raise HTTPException(
@@ -282,14 +290,18 @@ def get_image(image_id: int, db: Session = Depends(deps.get_db)):
     status_code=status.HTTP_201_CREATED
 )
 def add_image(image: models.Image = Depends(deps.save_image)):
+    """Allows to upload an image"""
     return image
 
+
+# Cart
 
 @app.get('/cart', response_model=List[schemas.CartItemRead])
 def get_cart_items(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db),
 ):
+    """Returns a list of authorized user's cart items"""
     return crud.get_cart_items(db, user.id)
 
 
@@ -303,6 +315,7 @@ def add_cart_item(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db),
 ):
+    """Adds an item to authorized user's cart"""
     cart_item_internal = schemas.CartItemCreateInternal(
         **cart_item.dict(),
         user_id=user.id
@@ -324,6 +337,7 @@ def get_cart_item(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db),
 ):
+    """Returns information about specified item in authorized user's cart"""
     return crud.get_cart_item(db, user.id, product_id)
 
 
@@ -334,6 +348,7 @@ def put_cart_item(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db),
 ):
+    """Allows to edit (PUT) an item in authorized user's cart"""
     cart_item_internal = schemas.CartItemUpdateInternal(
         **cart_item.dict(),
         product_id=product_id,
@@ -356,6 +371,7 @@ def delete_cart_item(
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db),
 ):
+    """Deletes specified item from authorized user's cart"""
     cart_item_internal = schemas.CartItemDelete(
         product_id=product_id,
         user_id=user.id,
