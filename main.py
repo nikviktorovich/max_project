@@ -76,7 +76,7 @@ async def login(
     return login_result
 
 
-@app.post('/signup')
+@app.post('/signup', response_model=schemas.Token)
 async def signup(token: schemas.Token = Depends(deps.register_user)):
     """
     """
