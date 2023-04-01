@@ -60,16 +60,12 @@ def value_error_handler(request, exception):
 
 # Auth
 
-@app.post('/token')
+@app.post('/token', response_model=schemas.Token)
 async def login(
     form_data: security.OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(deps.get_db)
+    db: Session = Depends(deps.get_db),
 ):
-    """
-    Returns:
-        access_token
-        token_type
-    """
+    """Authorizes user and returns an access token."""
     login_result = auth.login(db, form_data.username, form_data.password)
     if login_result is None:
         raise HTTPException(
