@@ -7,10 +7,6 @@ from .fixtures import overriden_app
 
 
 def test_registering(client: TestClient):
-    # Needs to be authorized
-    response = client.get('/')
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    
     # No data specified
     response = client.post('/signup')
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

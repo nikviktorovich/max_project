@@ -60,11 +60,6 @@ def value_error_handler(request, exception):
 
 # Auth
 
-@app.get('/')
-async def get_index(token: str = Depends(auth.oauth2_scheme)):
-    return {'token': token}
-
-
 @app.post('/token')
 async def login(
     form_data: security.OAuth2PasswordRequestForm = Depends(),
