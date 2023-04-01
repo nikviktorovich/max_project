@@ -95,6 +95,14 @@ async def signup(token: schemas.Token = Depends(deps.register_user)):
 
 # User
 
+@app.get('/user', response_model=schemas.UserRead)
+def get_user(
+    user: models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db),
+):
+    return user
+
+
 @app.patch('/user', response_model=schemas.UserRead)
 def patch_username(
     user_patch: schemas.UserFullnameUpdate,
