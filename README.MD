@@ -1,5 +1,5 @@
 # Overview
-Small market API project. Includes auth system, products data and user cart.
+Small market API project. Includes auth system, products data and user cart. Endpoints use root address as base.
 
 
 # Technology stack
