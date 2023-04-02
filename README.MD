@@ -33,7 +33,7 @@ The second step is creating and activating a virtual environment:
 - Bash
     ```bash
     python -m venv .venv
-    source .venv/Scripts/activate
+    source .venv/bin/activate
     ```
 
 
