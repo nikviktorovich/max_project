@@ -24,7 +24,7 @@ def test_create_product_with_images(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 
     # Uploading an image
-    with open('./tests/content/image_1.png', 'rb') as f:
+    with open('./src/tests/content/image_1.png', 'rb') as f:
         response = client.post('/images', files={'image': f})
     assert response.status_code == status.HTTP_201_CREATED
     image = response.json()
@@ -54,7 +54,7 @@ def test_put_product_images(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 
     # Uploading an image
-    with open('./tests/content/image_1.png', 'rb') as f:
+    with open('./src/tests/content/image_1.png', 'rb') as f:
         response = client.post('/images', files={'image': f})
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -88,7 +88,7 @@ def test_image_collision(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 
     # Uploading an image
-    with open('./tests/content/image_1.png', 'rb') as f:
+    with open('./src/tests/content/image_1.png', 'rb') as f:
         response = client.post('/images', files={'image': f})
     assert response.status_code == status.HTTP_201_CREATED
 

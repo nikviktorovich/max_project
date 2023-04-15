@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
 from .auth import User
 from .media import Image
-from .. import Base
+from ..database import Base
 
 
 class Product(Base):

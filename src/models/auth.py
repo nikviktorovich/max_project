@@ -6,7 +6,7 @@ from sqlalchemy import Table
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from .. import Base
+from ..database import Base
 
 
 # Many-to-many relationship of groups assigned to individual users

@@ -5,7 +5,7 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from .auth import User
 from .product import Product
-from .. import Base
+from ..database import Base
 
 
 class CartItem(Base):

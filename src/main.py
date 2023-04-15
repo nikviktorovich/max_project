@@ -11,11 +11,11 @@ from fastapi import responses
 from fastapi.middleware import cors
 from sqlalchemy.orm import Session
 from . import auth
+from . import crud
 from . import database
 from . import deps
-from .database import crud
-from .database import models
-from .database import schemas
+from . import models
+from . import schemas
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)

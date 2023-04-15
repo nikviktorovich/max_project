@@ -11,10 +11,10 @@ from fastapi import security
 from fastapi import status
 from sqlalchemy.orm import Session
 from . import auth
+from . import crud
 from . import database
-from .database import crud
-from .database import models
-from .database import schemas
+from . import models
+from . import schemas
 
 
 def get_db():
