@@ -1,11 +1,12 @@
 # Editor-specific
 .vscode/
 
-# Python Virtual Environment
+# Python
 venv
 .venv
 __pycache__
 *.db
+*.egg-info/
 
 # Tests
 .env
