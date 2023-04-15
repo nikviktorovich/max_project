@@ -43,9 +43,19 @@ python -m pip install -r requirements.txt
 ```
 
 
-Finally, you can start the server (default address is `http://127.0.0.1:8000/`):
+You might also want to install the app as a package
 ```
-python -m uvicorn src.main:app
+python -m pip install -e src/
+```
+
+
+After all the steps done, you can start the server (default address is `http://127.0.0.1:8000/`):
+```
+# If you installed the app as a package
+python -m uvicorn market.main:app
+
+# If you didn't
+python -m uvicorn src.market.main:app
 ```
 
 
