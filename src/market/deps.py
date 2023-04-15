@@ -26,15 +26,14 @@ def get_db():
 
 
 def get_user_create_form_data(
-    username: str = Body(),
-    password: str = Body(),
+    form_data: security.OAuth2PasswordRequestForm = Depends(),
     full_name: str = Body(default=''),
 ) -> schemas.UserCreate:
     try:
         return schemas.UserCreate(
-            username=username,
+            username=form_data.username,
+            password=form_data.password,
             full_name=full_name,
-            password=password
         )
     except pydantic.ValidationError as e:
         raise HTTPException(
@@ -45,7 +44,6 @@ def get_user_create_form_data(
 
 def register_user(
     user_data: schemas.UserCreate = Depends(get_user_create_form_data),
-    form_data: security.OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
     try:
