@@ -5,9 +5,9 @@ from typing import Any, Dict, Optional
 from fastapi import security
 from jose import jwt
 from sqlalchemy.orm import Session
-from database import crud
-from database import models
-from database import schemas
+from .database import crud
+from .database import models
+from .database import schemas
 
 
 logger = logging.getLogger(__name__)

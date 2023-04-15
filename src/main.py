@@ -1,9 +1,6 @@
 import logging
 import os.path
 import sqlalchemy.exc
-import auth
-import database
-import deps
 from typing import List
 from fastapi import Depends
 from fastapi import FastAPI
@@ -13,9 +10,12 @@ from fastapi import status
 from fastapi import responses
 from fastapi.middleware import cors
 from sqlalchemy.orm import Session
-from database import crud
-from database import models
-from database import schemas
+from . import auth
+from . import database
+from . import deps
+from .database import crud
+from .database import models
+from .database import schemas
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)

@@ -2,8 +2,6 @@ import logging
 import os
 import os.path
 import pydantic
-import auth
-import database
 from uuid import uuid4
 from fastapi import Body
 from fastapi import Depends
@@ -12,9 +10,11 @@ from fastapi import UploadFile
 from fastapi import security
 from fastapi import status
 from sqlalchemy.orm import Session
-from database import crud
-from database import models
-from database import schemas
+from . import auth
+from . import database
+from .database import crud
+from .database import models
+from .database import schemas
 
 
 def get_db():
