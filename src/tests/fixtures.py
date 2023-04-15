@@ -3,12 +3,12 @@ import pytest
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
-from .. import auth
-from .. import crud
-from .. import database
-from .. import deps
-from .. import main
-from .. import schemas
+from ..market import auth
+from ..market import crud
+from ..market import database
+from ..market import deps
+from ..market import main
+from ..market import schemas
 
 
 SQLALCHEMY_DATABASE_URL = 'sqlite:///./test_market_app.db'
