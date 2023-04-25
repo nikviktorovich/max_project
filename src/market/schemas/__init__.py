@@ -17,6 +17,6 @@ from .product import ProductRead
 from .product import ProductUpdate
 from .product import ProductPut
 from .product import Product
-from .product import ProductImageCreate
-from .product import ProductImageRead
-from .product import ProductImage
+from .product_image import ProductImageCreate
+from .product_image import ProductImageRead
+from .product_image import ProductImage

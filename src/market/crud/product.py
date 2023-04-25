@@ -58,14 +58,7 @@ def add_product(
     owner: models.User,
 ) -> Optional[models.Product]:
     product_dict = product.dict()
-    product_dict['images'] = []
-
     product_model = models.Product(**product_dict, owner=owner)
-
-    if product.images:
-        image_ids = [image.image_id for image in product.images]
-        _check_images_collision(db, image_ids)
-        product_model.images = _make_product_images(db, image_ids)
 
     db.add(product_model)
     db.commit()
@@ -80,10 +73,6 @@ def patch_product(
 ) -> Optional[models.Product]:
     """Updates instance's fields with new values from the schema"""
     product_dict = product.dict(exclude_unset=True)
-    
-    if 'images' in product_dict:
-        del product_dict['images']
-
     product_model = get_product_by_id(db, product_id)
 
     if product_model is None:
@@ -91,13 +80,6 @@ def patch_product(
 
     for key, value in product_dict.items():
         setattr(product_model, key, value)
-    
-    if product.images:
-        _delete_product_images(db, product_model)
-        
-        image_ids = [image.image_id for image in product.images]
-        _check_images_collision(db, image_ids)
-        product_model.images = _make_product_images(db, image_ids)
     
     db.commit()
     return product_model
@@ -109,8 +91,6 @@ def put_product(
     product: schemas.ProductPut,
 ) -> Optional[models.Product]:
     product_dict = product.dict()
-    del product_dict['images']
-
     product_model = get_product_by_id(db, product_id)
 
     if product_model is None:
@@ -118,13 +98,6 @@ def put_product(
 
     for key, value in product_dict.items():
         setattr(product_model, key, value)
-    
-    _delete_product_images(db, product_model)
-    
-    if product.images:
-        image_ids = [image.image_id for image in product.images]
-        _check_images_collision(db, image_ids)
-        product_model.images = _make_product_images(db, image_ids)
     
     db.commit()
     return product_model
@@ -134,27 +107,3 @@ def delete_product(db: Session, product_id: int) -> None:
     query = delete(models.Product).where(models.Product.id == product_id)
     db.execute(query)
     db.commit()
-
-
-def get_product_image_by_id(
-    db: Session,
-    product_image_id: int
-) -> Optional[models.ProductImage]:
-    """Returns product image with the specified id"""
-    query = select(models.ProductImage) \
-        .where(models.ProductImage.id == product_image_id)
-    return db.scalars(query).first()
-
-
-def add_product_image(
-    db: Session,
-    product: models.Product,
-    image: models.Image
-) -> Optional[models.ProductImage]:
-    product_image = models.ProductImage(
-        product=product,
-        image=image,
-    )
-    db.add(product_image)
-    db.commit()
-    return product_image

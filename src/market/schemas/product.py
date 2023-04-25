@@ -1,34 +1,8 @@
 import pydantic
 from datetime import datetime
-from typing import List, Optional
-from . import Image
-from . import ImageRead
+from typing import Optional
 from . import User
 from . import UserRead
-
-
-class ProductImageBase(pydantic.BaseModel):
-    pass
-
-
-class ProductImageCreate(ProductImageBase):
-    image_id: int
-
-    class Config:
-        orm_mode = True
-
-
-class ProductImageRead(ProductImageBase):
-    product_id: int
-    image: 'ImageRead'
-    
-    class Config:
-        orm_mode=True
-
-
-class ProductImage(ProductImageRead):
-    class Config:
-        orm_mode = True
 
 
 class ProductBase(pydantic.BaseModel):
@@ -40,8 +14,6 @@ class ProductBase(pydantic.BaseModel):
 
 
 class ProductCreate(ProductBase):
-    images: List[ProductImageCreate] = [] # List of image ids
-
     @pydantic.validator('title')
     def title_valid_length(cls, v):
         if len(v) < 8:
@@ -58,7 +30,6 @@ class ProductRead(ProductBase):
     added: datetime
     last_updated: datetime
     owner: UserRead
-    images: List['ProductImageRead']
     
     class Config:
         orm_mode=True
@@ -70,7 +41,6 @@ class ProductUpdate(pydantic.BaseModel):
     stock: Optional[int] = None
     price_rub: Optional[float] = None
     is_active: Optional[bool] = None
-    images: Optional[List[ProductImageCreate]] = None
 
     @pydantic.validator('title')
     def title_valid_length(cls, v):
@@ -92,7 +62,6 @@ class Product(ProductBase):
     added: datetime
     last_updated: datetime
     owner: User
-    images: List['ProductImage']
     
     class Config:
         orm_mode = True

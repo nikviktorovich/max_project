@@ -12,6 +12,17 @@ from .media import Image
 from ..database import Base
 
 
+class ProductImage(Base):
+    
+    __tablename__ = 'productimages'
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'))
+    product: Mapped['Product'] = relationship(back_populates='images')
+    image_id: Mapped[int] = mapped_column(ForeignKey('images.id'), unique=True)
+    image: Mapped['Image'] = relationship()
+
+
 class Product(Base):
     __tablename__ = 'products'
     
@@ -36,13 +47,3 @@ class Product(Base):
         back_populates='product',
         cascade="all, delete-orphan"
     )
-
-
-class ProductImage(Base):
-    __tablename__ = 'productimages'
-    
-    id: Mapped[int] = mapped_column(primary_key=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'))
-    product: Mapped['Product'] = relationship(back_populates='images')
-    image_id: Mapped[int] = mapped_column(ForeignKey('images.id'), unique=True)
-    image: Mapped['Image'] = relationship()

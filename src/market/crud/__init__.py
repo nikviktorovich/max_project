@@ -11,8 +11,10 @@ from .product import add_product
 from .product import patch_product
 from .product import put_product
 from .product import delete_product
-from .product import get_product_image_by_id
-from .product import add_product_image
+from .product_image import get_product_images
+from .product_image import get_product_image_by_id
+from .product_image import add_product_image
+from .product_image import delete_product_image
 from .cart import get_cart_item
 from .cart import get_cart_items
 from .cart import add_cart_item
