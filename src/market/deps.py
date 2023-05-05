@@ -10,11 +10,11 @@ from fastapi import UploadFile
 from fastapi import security
 from fastapi import status
 from sqlalchemy.orm import Session
-from . import auth
-from . import crud
 from . import database
-from . import models
+from . import domain
+from . import repositories
 from . import schemas
+from . import services
 
 
 def get_db():
@@ -42,31 +42,20 @@ def get_user_create_form_data(
         )
 
 
-def register_user(
-    user_data: schemas.UserCreate = Depends(get_user_create_form_data),
-    db: Session = Depends(get_db)
-):
-    try:
-        token = auth.register_user(db, user_data)
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
-    else:
-        return token
-
-
 def get_user(
-    token: str = Depends(auth.oauth2_scheme),
+    token: str = Depends(services.oauth2_scheme),
     db: Session = Depends(get_db),
-) -> models.User:
-    user = auth.get_user(db, token)
+) -> domain.models.User:
+    repo = repositories.UserRepository(db)
+    auth_service = services.AuthService(repo)
+    user = auth_service.get_user(token)
+
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='You are not authorized or your account is not active',
         )
+    
     return user
 
 
@@ -119,6 +108,9 @@ def write_image(image: UploadFile) -> str:
 def save_image(
     image_filename: str = Depends(write_image),
     db: Session = Depends(get_db)
-) -> models.Image:
-    image = crud.create_image(db, image_filename)
-    return image
+) -> domain.models.Image:
+    repo = repositories.ImageRepository(db)
+    instance = domain.models.Image(image=image_filename)
+    added_instance = repo.add(instance)
+    db.commit()
+    return added_instance
