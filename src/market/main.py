@@ -4,12 +4,15 @@ from fastapi import status
 from fastapi import responses
 from fastapi.middleware import cors
 from . import database
+from . import mappers
+from . import repositories
 from . import routers
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
 database.Base.metadata.create_all(bind=database.engine)
+mappers.start_mappers()
 
 app = FastAPI()
 
@@ -41,6 +44,14 @@ def global_exception_handler(request, exception):
 def value_error_handler(request, exception):
     return responses.JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
+        content={'detail': str(exception)},
+    )
+
+
+@app.exception_handler(repositories.exceptions.NotFoundError)
+def not_found_error_handler(request, exception):
+    return responses.JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
         content={'detail': str(exception)},
     )
 

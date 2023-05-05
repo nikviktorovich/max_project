@@ -1,27 +1,22 @@
 import pydantic
-from .media import ImageRead
+from typing import Optional
 
 
 class ProductImageBase(pydantic.BaseModel):
-    pass
-
-
-class ProductImageCreate(ProductImageBase):
     product_id: int
     image_id: int
 
-    class Config:
-        orm_mode = True
+
+class ProductImageCreate(ProductImageBase):
+    pass
 
 
 class ProductImageRead(ProductImageBase):
-    product_id: int
-    image: 'ImageRead'
-    
-    class Config:
-        orm_mode=True
+    id: int
 
 
-class ProductImage(ProductImageRead):
+class ProductImage(ProductImageBase):
+    id: Optional[int] = None
+
     class Config:
         orm_mode = True

@@ -3,9 +3,10 @@ from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import status
 from sqlalchemy.orm import Session
-from .. import crud
 from .. import deps
+from .. import domain
 from .. import models
+from .. import repositories
 from .. import schemas
 
 
@@ -16,42 +17,42 @@ router = APIRouter(
 
 
 @router.get('/', response_model=schemas.UserRead)
-def get_user(user: models.User = Depends(deps.get_user)):
+def get_user(user: domain.models.User = Depends(deps.get_user)):
     """Returns information of the authorized user"""
     return user
 
 
 @router.patch('/', response_model=schemas.UserRead)
 def patch_username(
-    user_patch: schemas.UserFullnameUpdate,
-    user: models.User = Depends(deps.get_user),
+    user_schema: schemas.UserFullnameUpdate,
+    user: domain.models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
     """Allows to edit (PATCH) the authorized user's information"""
-    patched_user = crud.patch_user_fullname(db, user.id, user_patch)
+    for key, value in user_schema.dict(exclude_unset=True).items():
+        setattr(user, key, value)
 
-    if patched_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='You need to authorize first',
-        )
+    repo = repositories.UserRepository(db)
+    patched_user = repo.add(user)
+
+    db.commit()
     
     return patched_user
 
 
 @router.put('/', response_model=schemas.UserRead)
 def put_username(
-    user_put: schemas.UserFullnamePut,
+    user_schema: schemas.UserFullnamePut,
     user: models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
     """Allows to edit (PUT) the authorized user's information"""
-    updated_user = crud.put_user_fullname(db, user.id, user_put)
+    for key, value in user_schema.dict().items():
+        setattr(user, key, value)
 
-    if updated_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='You need to authorize first',
-        )
+    repo = repositories.UserRepository(db)
+    updated_user = repo.add(user)
+    
+    db.commit()
     
     return updated_user

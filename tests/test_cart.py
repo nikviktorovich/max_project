@@ -90,10 +90,12 @@ def test_cart_update(client: TestClient):
 
     response = client.post('/cart', json=cart_item_data)
     assert response.status_code == status.HTTP_201_CREATED
+    created_cart_item = response.json()
+    created_cart_item_id = created_cart_item['id']
 
     # Updating cart item data
     cart_item_data['amount'] = 10
-    response = client.put(f'/cart/{product["id"]}', json=cart_item_data)
+    response = client.put(f'/cart/{created_cart_item_id}', json=cart_item_data)
     assert response.status_code == status.HTTP_200_OK
 
     updated_cart_item = response.json()

@@ -40,7 +40,7 @@ class UserRead(UserBase):
 
 
 class User(UserCreate):
-    id: int
+    id: Optional[int] = None
 
 
 class UserFullnameUpdate(pydantic.BaseModel):

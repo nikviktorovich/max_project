@@ -3,12 +3,13 @@ import pytest
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
-from market import auth
-from market import crud
+
 from market import database
 from market import deps
+from market import domain
 from market import main
-from market import schemas
+from market import repositories
+from market import services
 
 
 SQLALCHEMY_DATABASE_URL = 'sqlite:///./test_market_app.db'
@@ -45,42 +46,42 @@ def clear_db():
 def filled_db():
     with TestingSessionLocal() as db:
         # Adding 2 test users
-        users = [
-            schemas.UserCreate(
-                username='testuser1',
-                password='testuser1',
-                full_name='Some Test User',
-            ),
-            schemas.UserCreate(
-                username='testuser2',
-                password='testuser2',
-                full_name='Another Test User'
-            )
-        ]
+        user_repo = repositories.UserRepository(db)
+        auth_service = services.AuthService(user_repo)
 
-        for user in users:
-            auth.register_user(db, user)
+        test_user_1 = auth_service.register_user(
+            username='testuser1',
+            password='testuser1',
+            full_name='Some Test User',
+        )
+        test_user_2 = auth_service.register_user(
+            username='testuser2',
+            password='testuser2',
+            full_name='Another Test User',
+        )
+        
+        db.commit()
         
         
         # Adding 2 test products
-        test_product_1 = schemas.ProductCreate(
+        product_repo = repositories.ProductRepository(db)
+
+        test_product_1 = domain.models.Product(
             title='Some test product',
-            description='',
             stock=10,
             price_rub=1000,
+            owner_id=test_user_1.id,
         )
-        test_user_1 = crud.get_user_by_username(db, 'testuser1')
-        crud.add_product(db, test_product_1, test_user_1)
+        product_repo.add(test_product_1)
 
-        test_product_2 = schemas.ProductCreate(
+        test_product_2 = domain.models.Product(
             title='Another test product',
-            description='',
             stock=0,
             price_rub=100,
+            owner_id=test_user_2.id,
         )
-        test_user_2 = crud.get_user_by_username(db, 'testuser2')
-        crud.add_product(db, test_product_2, test_user_2)
-        
+        product_repo.add(test_product_2)
+
         db.commit()
 
 

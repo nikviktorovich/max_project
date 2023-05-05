@@ -1,4 +1,5 @@
 import pydantic
+from typing import Optional
 
 
 class CartItemBase(pydantic.BaseModel):
@@ -11,37 +12,22 @@ class CartItemBase(pydantic.BaseModel):
             raise ValueError('Invalid amount')
         return v
 
-    class Config:
-        orm_mode = True
-
 
 class CartItemCreate(CartItemBase):
     pass
 
 
-class CartItemCreateInternal(CartItemCreate):
-    user_id: int
-
-
 class CartItemRead(CartItemBase):
+    id: int
+
+
+class CartItemUpdate(CartItemBase):
     pass
 
 
-class CartItemUpdate(pydantic.BaseModel):
-    amount: int
-
-    @pydantic.validator('amount')
-    def valid_amount(cls, v: int):
-        if v <= 0:
-            raise ValueError('Invalid amount')
-        return v
-
-
-class CartItemUpdateInternal(CartItemUpdate):
+class CartItem(CartItemBase):
+    id: Optional[int] = None
     user_id: int
-    product_id: int
 
-
-class CartItemDelete(pydantic.BaseModel):
-    user_id: int
-    product_id: int
+    class Config:
+        orm_mode = True

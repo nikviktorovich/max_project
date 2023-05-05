@@ -5,9 +5,10 @@ from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import status
 from sqlalchemy.orm import Session
-from .. import crud
 from .. import deps
+from .. import domain
 from .. import models
+from .. import repositories
 from .. import schemas
 
 
@@ -22,7 +23,9 @@ router = APIRouter(
 @router.get('/', response_model=List[schemas.ProductImageRead])
 def get_product_images(product_id: int, db: Session = Depends(deps.get_db)):
     """Returns list of product images filtered by specified product"""
-    return crud.get_product_images(db, product_id)
+    repo = repositories.ProductImageRepository(db)
+    instances = repo.list(product_id=product_id)
+    return instances
 
 
 @router.post(
@@ -31,75 +34,58 @@ def get_product_images(product_id: int, db: Session = Depends(deps.get_db)):
     status_code=status.HTTP_201_CREATED,
 )
 def add_product_image(
-    product_image: schemas.ProductImageCreate,
-    owner: models.User = Depends(deps.get_user),
+    product_image_schema: schemas.ProductImageCreate,
+    user: domain.models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db),
 ):
-    product_model = crud.get_product_by_id(db, product_image.product_id)
+    product_repo = repositories.ProductRepository(db)
+    product_instance = product_repo.get(product_image_schema.product_id)
 
-    if product_model is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'Unable to find a product with id={product_image.product_id}',
-        )
-
-    if product_model.owner != owner:
+    if product_instance.owner_id != user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='You are not the product owner',
         )
-
-    image_model = crud.get_image_by_id(db, product_image.image_id)
-
-    if image_model is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'Unable to find an image with id={product_image.image_id}',
-        )
-
-    product_image_model = crud.add_product_image(
-        db,
-        product_model,
-        image_model,
+    
+    # To raise exception in case if image does not exist
+    image_repo = repositories.ImageRepository(db)
+    _ = image_repo.get(product_image_schema.image_id)
+    
+    product_image_repo = repositories.ProductImageRepository(db)
+    product_image_instance = domain.models.ProductImage(
+        product_id=product_image_schema.product_id,
+        image_id=product_image_schema.image_id,
     )
+    product_image_repo.add(product_image_instance)
 
     db.commit()
-
-    if product_image_model is None:
-        logger.error(
-            'Failed adding product image. User: '
-            f'{owner.username}, Product image: {product_image}'
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Unable to add product image',
-        )
     
-    return product_image_model
+    return product_image_instance
 
 
 @router.get('/{product_image_id}', response_model=schemas.ProductImageRead)
 def get_product_image(product_image_id: int, db: Session = Depends(deps.get_db)):
-    product_image_model = crud.get_product_image_by_id(db, product_image_id)
-
-    if product_image_model is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Unable to find a product image with id={product_image_id}',
-        )
-
-    return product_image_model
+    repo = repositories.ProductImageRepository(db)
+    instance = repo.get(product_image_id)
+    return instance
 
 
 @router.delete('/{product_image_id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_product_image(product_image_id: int, db: Session = Depends(deps.get_db)):
-    product_image_model = crud.get_product_image_by_id(db, product_image_id)
+def delete_product_image(
+    product_image_id: int,
+    user: domain.models.User = Depends(deps.get_user),
+    db: Session = Depends(deps.get_db)
+):
+    product_image_repo = repositories.ProductImageRepository(db)
+    product_image_instance = product_image_repo.get(product_image_id)
 
-    if product_image_model is None:
+    product_repo = repositories.ProductRepository(db)
+    product_instance = product_repo.get(product_image_instance.product_id)
+
+    if product_instance.owner_id != user.id:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Unable to find a product image with id={product_image_id}',
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='You are not the product owner',
         )
-    
-    crud.delete_product_image(db, product_image_id)
+
     db.commit()

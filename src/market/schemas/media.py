@@ -1,5 +1,6 @@
 import os
 import pydantic
+from typing import Optional
 from urllib.parse import urljoin
 
 
@@ -26,6 +27,8 @@ class ImageRead(ImageBase):
         orm_mode = True
 
 
-class Image(ImageRead):
+class Image(ImageBase):
+    id: Optional[int] = None
+
     class Config:
         orm_mode = True
