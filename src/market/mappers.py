@@ -1,7 +1,7 @@
 from sqlalchemy.orm import registry
 
-from . import models
 from . import domain
+from .database import models
 
 
 def start_mappers() -> None:

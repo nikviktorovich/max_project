@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 
 from .. import deps
 from .. import domain
-from .. import models
 from .. import repositories
 from .. import schemas
 

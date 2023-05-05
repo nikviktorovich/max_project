@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
-from ..database.orm import Base
+from ..orm import Base
 
 
 class Image(Base):
