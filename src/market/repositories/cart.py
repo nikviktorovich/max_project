@@ -1,6 +1,8 @@
 import logging
 from typing import List
+
 from sqlalchemy.orm import Session
+
 from . import exceptions
 from .. import domain
 

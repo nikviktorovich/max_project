@@ -1,5 +1,4 @@
 from sqlalchemy.orm import registry
-from sqlalchemy.orm import relationship
 
 from . import models
 from . import domain

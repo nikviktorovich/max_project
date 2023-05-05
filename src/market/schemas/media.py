@@ -1,7 +1,8 @@
 import os
-import pydantic
 from typing import Optional
 from urllib.parse import urljoin
+
+import pydantic
 
 
 class ImageBase(pydantic.BaseModel):

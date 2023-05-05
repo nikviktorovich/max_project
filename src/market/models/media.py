@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+
 from ..database import Base
 
 

@@ -1,6 +1,7 @@
-import pydantic
 from datetime import datetime
 from typing import Optional
+
+import pydantic
 
 
 class ProductBase(pydantic.BaseModel):

@@ -1,8 +1,10 @@
 import logging
+
 from fastapi import FastAPI
 from fastapi import status
 from fastapi import responses
 from fastapi.middleware import cors
+
 from . import database
 from . import mappers
 from . import repositories
