@@ -11,7 +11,7 @@ from sqlalchemy.orm import Mapped
 
 from .auth import User
 from .media import Image
-from ..database import Base
+from ..database.orm import Base
 
 
 class ProductImage(Base):

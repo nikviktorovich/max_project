@@ -13,7 +13,7 @@ from . import routers
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
-database.Base.metadata.create_all(bind=database.engine)
+database.orm.Base.metadata.create_all(bind=database.orm.engine)
 mappers.start_mappers()
 
 app = FastAPI()

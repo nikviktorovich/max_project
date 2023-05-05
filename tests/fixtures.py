@@ -36,10 +36,10 @@ def get_test_db():
 
 @pytest.fixture(autouse=True, scope="module")
 def clear_db():
-    database.Base.metadata.drop_all(bind=engine)
-    database.Base.metadata.create_all(bind=engine)
+    database.orm.Base.metadata.drop_all(bind=engine)
+    database.orm.Base.metadata.create_all(bind=engine)
     yield
-    database.Base.metadata.drop_all(bind=engine)
+    database.orm.Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(autouse=True, scope="module")

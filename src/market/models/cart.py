@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 
 from .auth import User
 from .product import Product
-from ..database import Base
+from ..database.orm import Base
 
 
 class CartItem(Base):
