@@ -1,12 +1,11 @@
 import sqlalchemy
 import sqlalchemy.orm
 
+from .. import config
 
-# TODO: Change url to environment variable value and change configuration
-SQLALCHEMY_DATABASE_URL = 'sqlite:///./market_app.db'
 
 engine = sqlalchemy.create_engine(
-    url=SQLALCHEMY_DATABASE_URL,
+    url=config.get_database_connection_url(),
     connect_args={'check_same_thread': False}
 )
 

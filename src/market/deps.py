@@ -20,7 +20,7 @@ from . import services
 
 
 def get_db():
-    db = database.SessionLocal()
+    db = database.orm.SessionLocal()
     try:
         yield db
     finally:
