@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 
 from .. import deps
 from .. import domain
-from .. import models
 from .. import repositories
 from .. import schemas
 
@@ -42,7 +41,7 @@ def patch_username(
 @router.put('/', response_model=schemas.UserRead)
 def put_username(
     user_schema: schemas.UserFullnamePut,
-    user: models.User = Depends(deps.get_user),
+    user: domain.models.User = Depends(deps.get_user),
     db: Session = Depends(deps.get_db)
 ):
     """Allows to edit (PUT) the authorized user's information"""
