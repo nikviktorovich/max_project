@@ -35,7 +35,7 @@ def get_test_db():
         db.close()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 def clear_db():
     market.database.orm.Base.metadata.drop_all(bind=engine)
     market.database.orm.Base.metadata.create_all(bind=engine)
@@ -44,7 +44,7 @@ def clear_db():
 
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 def filled_db():
     with TestingSessionLocal() as db:
         # Adding 2 test users

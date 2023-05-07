@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from .common import login
 
 
-@pytest.mark.usefixtures('clear_db', 'filled_db', 'client')
+@pytest.mark.usefixtures('client')
 def test_upload(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 

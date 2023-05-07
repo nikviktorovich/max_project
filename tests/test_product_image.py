@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from .common import login
 
 
-@pytest.mark.usefixtures('clear_db', 'filled_db', 'client')
+@pytest.mark.usefixtures('client')
 def upload_image(client: TestClient, path: str) -> Dict[str, Any]:
     with open(path, 'rb') as f:
         response = client.post('/images', files={'image': f})
@@ -19,7 +19,7 @@ def upload_image(client: TestClient, path: str) -> Dict[str, Any]:
     return image
 
 
-@pytest.mark.usefixtures('clear_db', 'filled_db', 'client')
+@pytest.mark.usefixtures('client')
 def create_product(
     client: TestClient,
     title: str,
@@ -38,7 +38,7 @@ def create_product(
     return product
 
 
-@pytest.mark.usefixtures('clear_db', 'filled_db', 'client')
+@pytest.mark.usefixtures('client')
 def create_product_image(
     client: TestClient,
     product_id: int,
@@ -55,7 +55,7 @@ def create_product_image(
     return product_image
 
 
-@pytest.mark.usefixtures('clear_db', 'filled_db', 'client')
+@pytest.mark.usefixtures('client')
 def list_product_images(
     client: TestClient,
     product_id: int,
@@ -67,7 +67,7 @@ def list_product_images(
     return product_image_list
 
 
-@pytest.mark.usefixtures('clear_db', 'filled_db', 'client')
+@pytest.mark.usefixtures('client')
 def test_create_product_with_images(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 
