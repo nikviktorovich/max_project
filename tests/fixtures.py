@@ -4,11 +4,11 @@ import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
+import market.database.orm
 import market.modules.user.repositories
 import market.modules.product.domain.models
 import market.modules.product.repositories
-from market import database
-from market import services
+import market.services
 from market.apps.fastapi_app import deps
 from market.apps.fastapi_app import fastapi_main
 
@@ -37,10 +37,10 @@ def get_test_db():
 
 @pytest.fixture(autouse=True, scope="module")
 def clear_db():
-    database.orm.Base.metadata.drop_all(bind=engine)
-    database.orm.Base.metadata.create_all(bind=engine)
+    market.database.orm.Base.metadata.drop_all(bind=engine)
+    market.database.orm.Base.metadata.create_all(bind=engine)
     yield
-    database.orm.Base.metadata.drop_all(bind=engine)
+    market.database.orm.Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(autouse=True, scope="module")
@@ -48,7 +48,7 @@ def filled_db():
     with TestingSessionLocal() as db:
         # Adding 2 test users
         user_repo = market.modules.user.repositories.UserRepository(db)
-        auth_service = services.AuthService(user_repo)
+        auth_service = market.services.AuthService(user_repo)
 
         test_user_1 = auth_service.register_user(
             username='testuser1',

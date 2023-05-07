@@ -4,12 +4,12 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from .auth import User
-from .product import Product
-from ..orm import Base
+import market.database.orm
+from market.database.models.auth import User
+from market.database.models.product import Product
 
 
-class CartItem(Base):
+class CartItem(market.database.orm.Base):
     __tablename__ = 'cartitems'
     __table_args__ = (
         UniqueConstraint(

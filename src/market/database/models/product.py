@@ -9,12 +9,12 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
 
-from .auth import User
-from .media import Image
-from ..orm import Base
+import market.database.orm
+from market.database.models.auth import User
+from market.database.models.media import Image
 
 
-class ProductImage(Base):
+class ProductImage(market.database.orm.Base):
     
     __tablename__ = 'productimages'
     
@@ -25,7 +25,7 @@ class ProductImage(Base):
     image: Mapped['Image'] = relationship()
 
 
-class Product(Base):
+class Product(market.database.orm.Base):
     __tablename__ = 'products'
     
     id: Mapped[int] = mapped_column(primary_key=True)

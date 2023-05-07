@@ -1,11 +1,11 @@
 import sqlalchemy
 import sqlalchemy.orm
 
-from .. import config
+import market.config
 
 
 engine = sqlalchemy.create_engine(
-    url=config.get_database_connection_url(),
+    url=market.config.get_database_connection_url(),
     connect_args={'check_same_thread': False}
 )
 

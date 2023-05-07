@@ -8,13 +8,13 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from ..orm import Base
+import market.database.orm
 
 
 # Many-to-many relationship of groups assigned to individual users
 user_groups = Table(
     'user_groups',
-    Base.metadata,
+    market.database.orm.Base.metadata,
     Column('user_id', ForeignKey('users.id')),
     Column('group_id', ForeignKey('groups.id')),
 )
@@ -22,7 +22,7 @@ user_groups = Table(
 # Many-to-many relationship of permissions assigned to individual users
 user_permissions = Table(
     'user_permissions',
-    Base.metadata,
+    market.database.orm.Base.metadata,
     Column('user_id', ForeignKey('users.id')),
     Column('permission_id', ForeignKey('permissions.id')),
 )
@@ -30,13 +30,13 @@ user_permissions = Table(
 # Many-to-many relationship of permissions assigned to groups
 group_permissions = Table(
     'group_permissions',
-    Base.metadata,
+    market.database.orm.Base.metadata,
     Column('group_id', ForeignKey('groups.id')),
     Column('permission_id', ForeignKey('permissions.id')),
 )
 
 
-class User(Base):
+class User(market.database.orm.Base):
     __tablename__ = 'users'
     
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -47,7 +47,7 @@ class User(Base):
     permissions: Mapped[List['Permission']] = relationship(secondary=user_permissions)
 
 
-class Permission(Base):
+class Permission(market.database.orm.Base):
     __tablename__ = 'permissions'
     
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -55,7 +55,7 @@ class Permission(Base):
     codename: Mapped[str] = mapped_column(String(100))
 
 
-class Group(Base):
+class Group(market.database.orm.Base):
     __tablename__ = 'groups'
     
     id: Mapped[int] = mapped_column(primary_key=True)

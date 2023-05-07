@@ -8,9 +8,9 @@ import passlib.context
 from fastapi import security
 from jose import jwt
 
+import market.config
 from market.modules.user.domain import models
 from market.modules.user import repositories
-from .. import config
 
 
 logger = logging.getLogger(__name__)
@@ -83,8 +83,8 @@ class AuthService:
         expire = datetime.datetime.utcnow() + expires_delta
         to_encode.update({'exp': expire})
 
-        secret_key = config.get_hash_secret_key()
-        algorithm = config.get_hash_algorithm()
+        secret_key = market.config.get_hash_secret_key()
+        algorithm = market.config.get_hash_algorithm()
         encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
 
         return encoded_jwt
@@ -96,8 +96,8 @@ class AuthService:
         Raises:
             jose.JWTError:
         """
-        secret_key = config.get_hash_secret_key()
-        algorithm = config.get_hash_algorithm()
+        secret_key = market.config.get_hash_secret_key()
+        algorithm = market.config.get_hash_algorithm()
         return jwt.decode(token, secret_key, algorithms=[algorithm])
 
 
@@ -106,7 +106,7 @@ class AuthService:
         if user is None:
             return None
         
-        expire_minutes = config.get_access_token_expire_minutes()
+        expire_minutes = market.config.get_access_token_expire_minutes()
         access_token_expires = datetime.timedelta(minutes=expire_minutes)
         access_token = self.create_access_token(
             data={'sub': user.username},
