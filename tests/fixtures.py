@@ -4,12 +4,13 @@ import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
+import market.modules.user.repositories
+import market.modules.product.domain.models
+import market.modules.product.repositories
 from market import database
-from market import deps
-from market import domain
-from market import main
-from market import repositories
 from market import services
+from market.apps.fastapi_app import deps
+from market.apps.fastapi_app import fastapi_main
 
 
 SQLALCHEMY_DATABASE_URL = 'sqlite:///./test_market_app.db'
@@ -46,7 +47,7 @@ def clear_db():
 def filled_db():
     with TestingSessionLocal() as db:
         # Adding 2 test users
-        user_repo = repositories.UserRepository(db)
+        user_repo = market.modules.user.repositories.UserRepository(db)
         auth_service = services.AuthService(user_repo)
 
         test_user_1 = auth_service.register_user(
@@ -64,9 +65,9 @@ def filled_db():
         
         
         # Adding 2 test products
-        product_repo = repositories.ProductRepository(db)
+        product_repo = market.modules.product.repositories.ProductRepository(db)
 
-        test_product_1 = domain.models.Product(
+        test_product_1 = market.modules.product.domain.models.Product(
             title='Some test product',
             stock=10,
             price_rub=1000,
@@ -74,7 +75,7 @@ def filled_db():
         )
         product_repo.add(test_product_1)
 
-        test_product_2 = domain.models.Product(
+        test_product_2 = market.modules.product.domain.models.Product(
             title='Another test product',
             stock=0,
             price_rub=100,
@@ -87,11 +88,11 @@ def filled_db():
 
 @pytest.fixture(autouse=True)
 def overriden_app():
-    main.app.dependency_overrides[deps.get_db] = get_test_db
-    yield main.app
-    del main.app.dependency_overrides[deps.get_db]
+    fastapi_main.app.dependency_overrides[deps.get_db] = get_test_db
+    yield fastapi_main.app
+    del fastapi_main.app.dependency_overrides[deps.get_db]
 
 
 @pytest.fixture
 def client():
-    return fastapi.testclient.TestClient(main.app)
+    return fastapi.testclient.TestClient(fastapi_main.app)

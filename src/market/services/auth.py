@@ -8,9 +8,9 @@ import passlib.context
 from fastapi import security
 from jose import jwt
 
+from market.modules.user.domain import models
+from market.modules.user import repositories
 from .. import config
-from .. import domain
-from .. import repositories
 
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class AuthService:
         return self.pwd_context.hash(password)
 
 
-    def get_user_by_username(self, username: str) -> Optional[domain.models.User]:
+    def get_user_by_username(self, username: str) -> Optional[models.User]:
         matching_users_list = self.repo.list(username=username)
         
         if not matching_users_list:
@@ -59,7 +59,7 @@ class AuthService:
         self,
         username: str,
         password: str,
-    ) -> Optional[domain.models.User]:
+    ) -> Optional[models.User]:
         user = self.get_user_by_username(username)
 
         if user is None:
@@ -101,7 +101,7 @@ class AuthService:
         return jwt.decode(token, secret_key, algorithms=[algorithm])
 
 
-    def login(self, username: str, password: str) -> Optional[domain.models.Token]:
+    def login(self, username: str, password: str) -> Optional[models.Token]:
         user = self.authenticate_user(username, password)
         if user is None:
             return None
@@ -112,13 +112,13 @@ class AuthService:
             data={'sub': user.username},
             expires_delta=access_token_expires
         )
-        return domain.models.Token(access_token=access_token, token_type='bearer')
+        return models.Token(access_token=access_token, token_type='bearer')
 
 
     def get_user(
         self,
         token: str,
-    ) -> Optional[domain.models.User]:
+    ) -> Optional[models.User]:
         """Reads the token and returns the corresponding user
         Reads the token and returns the corresponding user. If user is not active
         or token is expired (not implemented for simplicity) None is returned.
@@ -134,13 +134,13 @@ class AuthService:
         username: str,
         password: str,
         full_name: str = '',
-    ) -> domain.models.User:
+    ) -> models.User:
         hashed_password = self.hash_password(password)
         
         if not self.is_username_available(username):
             raise ValueError('Username is already taken')
         
-        instance = domain.models.User(
+        instance = models.User(
             username=username,
             password=hashed_password,
             full_name=full_name,
