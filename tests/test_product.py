@@ -1,13 +1,11 @@
+import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from .fixtures import clear_db
-from .fixtures import client
-from .fixtures import filled_db
-from .fixtures import overriden_app
 from .common import login
 
 
+@pytest.mark.usefixtures('clear_db', 'filled_db', 'client')
 def test_product_create(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 

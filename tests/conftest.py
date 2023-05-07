@@ -35,7 +35,7 @@ def get_test_db():
         db.close()
 
 
-@pytest.fixture(autouse=True, scope="module")
+@pytest.fixture(scope="module")
 def clear_db():
     market.database.orm.Base.metadata.drop_all(bind=engine)
     market.database.orm.Base.metadata.create_all(bind=engine)
@@ -43,7 +43,8 @@ def clear_db():
     market.database.orm.Base.metadata.drop_all(bind=engine)
 
 
-@pytest.fixture(autouse=True, scope="module")
+
+@pytest.fixture(scope="module")
 def filled_db():
     with TestingSessionLocal() as db:
         # Adding 2 test users
@@ -86,7 +87,7 @@ def filled_db():
         db.commit()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def overriden_app():
     fastapi_main.app.dependency_overrides[deps.get_db] = get_test_db
     yield fastapi_main.app
@@ -94,5 +95,5 @@ def overriden_app():
 
 
 @pytest.fixture
-def client():
-    return fastapi.testclient.TestClient(fastapi_main.app)
+def client(overriden_app):
+    return fastapi.testclient.TestClient(overriden_app)
