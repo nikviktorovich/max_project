@@ -1,8 +1,8 @@
 import dataclasses
-from typing import Optional
+from typing import Any
 
 
 @dataclasses.dataclass
 class Image:
     image: str
-    id: Optional[str] = None
+    id: Any = None

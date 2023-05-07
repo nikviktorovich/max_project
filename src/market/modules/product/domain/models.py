@@ -1,5 +1,6 @@
 import dataclasses
 from datetime import datetime
+from typing import Any
 from typing import Optional
 
 
@@ -9,7 +10,7 @@ class Product:
     stock: int
     price_rub: float
     owner_id: int
-    id: Optional[int] = None
+    id: Any = None
     description: str = ''
     added: Optional[datetime] = None
     last_updated: Optional[datetime] = None

@@ -1,12 +1,12 @@
 import dataclasses
-from typing import Optional
+from typing import Any
 
 
 @dataclasses.dataclass
 class User:
     username: str
     password: str
-    id: Optional[int] = None
+    id: Any = None
     full_name: str = ''
 
 
@@ -14,13 +14,13 @@ class User:
 class Permission:
     name: str
     codename: str
-    id: Optional[int] = None
+    id: Any = None
 
 
 @dataclasses.dataclass
 class Group:
     name: str
-    id: Optional[int] = None
+    id: Any = None
 
 
 @dataclasses.dataclass

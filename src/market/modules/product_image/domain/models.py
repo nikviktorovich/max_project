@@ -1,9 +1,9 @@
 import dataclasses
-from typing import Optional
+from typing import Any
 
 
 @dataclasses.dataclass
 class ProductImage:
     product_id: int
     image_id: int
-    id: Optional[int] = None
+    id: Any = None
