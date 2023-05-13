@@ -13,6 +13,7 @@ from fastapi import status
 from sqlalchemy.orm import Session
 
 import market.database
+import market.database.orm
 import market.services
 import market.modules.image.domain.models
 import market.modules.image.repositories
@@ -22,7 +23,7 @@ import market.modules.user.schemas
 
 
 def get_db():
-    db = market.database.orm.SessionLocal()
+    db = market.database.orm.DEFAULT_SESSION_FACTORY()
     try:
         yield db
     finally:

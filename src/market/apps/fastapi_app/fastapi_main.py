@@ -7,13 +7,16 @@ from fastapi.middleware import cors
 
 import market.apps.fastapi_app.routers
 import market.common.errors
+import market.config
 import market.database.orm
 import market.mappers
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
-market.database.orm.Base.metadata.create_all(bind=market.database.orm.engine)
+market.database.orm.Base.metadata.create_all(
+    bind=market.config.get_database_engine(),
+)
 market.mappers.start_mappers()
 
 app = FastAPI()
