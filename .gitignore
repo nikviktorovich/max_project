@@ -10,4 +10,5 @@ __pycache__
 
 # Tests
 .env
+.env_*
 .pytest_cache/
