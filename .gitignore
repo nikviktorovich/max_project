@@ -9,6 +9,5 @@ __pycache__
 *.egg-info/
 
 # Tests
-.env
-.env_*
+*.env
 .pytest_cache/
