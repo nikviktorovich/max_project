@@ -1,3 +1,4 @@
+import contextlib
 import logging
 
 from fastapi import FastAPI
@@ -14,12 +15,17 @@ import market.mappers
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
-market.database.orm.Base.metadata.create_all(
-    bind=market.config.get_database_engine(),
-)
 market.mappers.start_mappers()
 
-app = FastAPI()
+
+@contextlib.asynccontextmanager
+async def app_lifespan(app: FastAPI):
+    market.database.orm.Base.metadata.create_all(
+        bind=market.config.get_database_engine(),
+    )
+    yield
+
+app = FastAPI(lifespan=app_lifespan)
 
 # CORS configuration
 origins = [
