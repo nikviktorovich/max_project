@@ -1,9 +1,9 @@
+import contextlib
+
 import fastapi.testclient
 import pytest
-import sqlalchemy
-import sqlalchemy.ext.declarative
-import sqlalchemy.orm
 
+import market.config
 import market.database.orm
 import market.modules.user.repositories
 import market.modules.product.domain.models
@@ -13,40 +13,32 @@ from market.apps.fastapi_app import deps
 from market.apps.fastapi_app import fastapi_main
 
 
-SQLALCHEMY_DATABASE_URL = 'sqlite:///./test_market_app.db'
-
-engine = sqlalchemy.create_engine(
-    url=SQLALCHEMY_DATABASE_URL,
-    connect_args={'check_same_thread': False}
-)
-
-TestingSessionLocal = sqlalchemy.orm.sessionmaker(
-    bind=engine,
-    autocommit=False,
-    autoflush=False,
-)
+@pytest.fixture
+def client():
+    return fastapi.testclient.TestClient(fastapi_main.app)
 
 
-def get_test_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@pytest.fixture(autouse=True)
+def clear_db(client):
+    engine = market.config.get_database_engine()
+
+    # In case if previous tests unexpectedly crashed and db wasn't cleared up
+    market.database.orm.Base.metadata.drop_all(
+        bind=engine,
+    )
+
+    with client:
+        yield
+    
+    market.database.orm.Base.metadata.drop_all(
+        bind=engine,
+    )
 
 
-@pytest.fixture(scope="module", autouse=True)
-def clear_db():
-    market.database.orm.Base.metadata.drop_all(bind=engine)
-    market.database.orm.Base.metadata.create_all(bind=engine)
-    yield
-    market.database.orm.Base.metadata.drop_all(bind=engine)
-
-
-
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 def filled_db():
-    with TestingSessionLocal() as db:
+    db_manager = contextlib.contextmanager(deps.get_db)
+    with db_manager() as db:
         # Adding 2 test users
         user_repo = market.modules.user.repositories.UserRepository(db)
         auth_service = market.services.AuthService(user_repo)
@@ -85,15 +77,3 @@ def filled_db():
         product_repo.add(test_product_2)
 
         db.commit()
-
-
-@pytest.fixture
-def overriden_app():
-    fastapi_main.app.dependency_overrides[deps.get_db] = get_test_db
-    yield fastapi_main.app
-    del fastapi_main.app.dependency_overrides[deps.get_db]
-
-
-@pytest.fixture
-def client(overriden_app):
-    return fastapi.testclient.TestClient(overriden_app)

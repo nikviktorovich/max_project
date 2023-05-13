@@ -3,7 +3,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 
-@pytest.mark.usefixtures('client')
+@pytest.mark.usefixtures('clear_db', 'client')
 def test_registering(client: TestClient):
     # No data specified
     response = client.post('/signup')
@@ -32,7 +32,7 @@ def test_registering(client: TestClient):
     assert response.status_code == status.HTTP_200_OK
 
 
-@pytest.mark.usefixtures('client')
+@pytest.mark.usefixtures('clear_db', 'client')
 def test_login(client: TestClient):
     data = {
         'username': 'testuser1',
