@@ -6,6 +6,9 @@ class Token(pydantic.BaseModel):
     access_token: str
     token_type: str
 
+    class Config:
+        orm_mode=True
+
 
 class UserBase(pydantic.BaseModel):
     username: str

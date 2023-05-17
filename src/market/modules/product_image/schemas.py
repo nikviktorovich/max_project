@@ -14,9 +14,9 @@ class ProductImageCreate(ProductImageBase):
 class ProductImageRead(ProductImageBase):
     id: int
 
+    class Config:
+        orm_mode = True
+
 
 class ProductImage(ProductImageBase):
     id: Optional[int] = None
-
-    class Config:
-        orm_mode = True

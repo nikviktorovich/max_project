@@ -9,6 +9,7 @@ import market.services
 from market.apps.fastapi_app import deps
 from market.modules.user import repositories
 from market.modules.user import schemas
+from market.modules.user import unit_of_work
 
 router = APIRouter(
     tags=['auth']
@@ -38,19 +39,18 @@ async def login(
 @router.post('/signup', response_model=schemas.Token)
 async def signup(
     user_schema: schemas.UserCreate = Depends(deps.get_user_create_form_data),
-    db: Session = Depends(deps.get_db),
 ):
     """Allows user to sign up and returns an access token."""
-    repo = repositories.UserRepository(db)
-    auth_service = market.services.AuthService(repo)
+    with unit_of_work.UserUnitOfWork() as uow:
+        auth_service = market.services.AuthService(uow.users)
 
-    auth_service.register_user(
-        username=user_schema.username,
-        password=user_schema.password,
-        full_name=user_schema.full_name,
-    )
-    db.commit()
+        auth_service.register_user(
+            username=user_schema.username,
+            password=user_schema.password,
+            full_name=user_schema.full_name,
+        )
+        uow.commit()
 
-    token = auth_service.login(user_schema.username, user_schema.password)
+        token = auth_service.login(user_schema.username, user_schema.password)
 
-    return token
+        return schemas.Token.from_orm(token)

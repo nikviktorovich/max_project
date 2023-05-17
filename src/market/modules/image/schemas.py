@@ -23,13 +23,10 @@ class ImageRead(ImageBase):
         if media_url_root is None:
             raise RuntimeError('MEDIA_URL_ROOT is not specified')
         return urljoin(media_url_root, v)
-
+    
     class Config:
         orm_mode = True
 
 
 class Image(ImageBase):
     id: Optional[int] = None
-
-    class Config:
-        orm_mode = True

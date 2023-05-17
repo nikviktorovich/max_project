@@ -30,6 +30,9 @@ class ProductRead(ProductBase):
     last_updated: datetime
     owner_id: int
 
+    class Config:
+        orm_mode = True
+
 
 class ProductPut(ProductCreate):
     pass
@@ -40,6 +43,3 @@ class Product(ProductBase):
     added: datetime
     last_updated: datetime
     owner_id: int
-
-    class Config:
-        orm_mode = True

@@ -13,6 +13,7 @@ import market.modules.image.repositories
 from market.apps.fastapi_app import deps
 from market.modules.product_image import repositories
 from market.modules.product_image import schemas
+from market.modules.product_image import unit_of_work
 from market.modules.product_image.domain import models
 
 
@@ -40,31 +41,25 @@ def get_product_images(product_id: int, db: Session = Depends(deps.get_db)):
 def add_product_image(
     product_image_schema: schemas.ProductImageCreate,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
-    db: Session = Depends(deps.get_db),
 ):
-    product_repo = market.modules.product.repositories.ProductRepository(db)
-    product_instance = product_repo.get(product_image_schema.product_id)
+    with unit_of_work.ProductImageUnitOfWork() as uow:
+        product_instance = uow.products.get(product_image_schema.product_id)
 
-    if product_instance.owner_id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='You are not the product owner',
+        if product_instance.owner_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='You are not the product owner',
+            )
+        
+        image_instance = uow.images.get(product_image_schema.image_id)
+        product_image_instance = models.ProductImage(
+            product_id=product_instance.id,
+            image_id=image_instance.id,
         )
-    
-    # To raise exception in case if image does not exist
-    image_repo = market.modules.image.repositories.ImageRepository(db)
-    _ = image_repo.get(product_image_schema.image_id)
-    
-    product_image_repo = repositories.ProductImageRepository(db)
-    product_image_instance = models.ProductImage(
-        product_id=product_image_schema.product_id,
-        image_id=product_image_schema.image_id,
-    )
-    product_image_repo.add(product_image_instance)
-
-    db.commit()
-    
-    return product_image_instance
+        uow.product_images.add(product_image_instance)
+        uow.commit()
+        
+        return schemas.ProductImageRead.from_orm(product_image_instance)
 
 
 @router.get('/{product_image_id}', response_model=schemas.ProductImageRead)
@@ -78,18 +73,16 @@ def get_product_image(product_image_id: int, db: Session = Depends(deps.get_db))
 def delete_product_image(
     product_image_id: int,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
-    db: Session = Depends(deps.get_db)
 ):
-    product_image_repo = repositories.ProductImageRepository(db)
-    product_image_instance = product_image_repo.get(product_image_id)
+    with unit_of_work.ProductImageUnitOfWork() as uow:
+        product_image_instance = uow.product_images.get(product_image_id)
+        product_instance = uow.products.get(product_image_instance.product_id)
 
-    product_repo = market.modules.product.repositories.ProductRepository(db)
-    product_instance = product_repo.get(product_image_instance.product_id)
+        if product_instance.owner_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='You are not the product owner',
+            )
 
-    if product_instance.owner_id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='You are not the product owner',
-        )
-
-    db.commit()
+        uow.product_images.delete(product_image_instance)
+        uow.commit()

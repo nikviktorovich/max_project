@@ -20,6 +20,9 @@ class CartItemCreate(CartItemBase):
 class CartItemRead(CartItemBase):
     id: int
 
+    class Config:
+        orm_mode = True
+
 
 class CartItemUpdate(CartItemBase):
     pass
@@ -28,6 +31,3 @@ class CartItemUpdate(CartItemBase):
 class CartItem(CartItemBase):
     id: Optional[int] = None
     user_id: int
-
-    class Config:
-        orm_mode = True
