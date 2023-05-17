@@ -33,7 +33,7 @@ async def login(
             headers={'WWW-Authenticate': 'Bearer'},
         )
     
-    return token
+    return schemas.Token.from_orm(token)
 
 
 @router.post('/signup', response_model=schemas.Token)

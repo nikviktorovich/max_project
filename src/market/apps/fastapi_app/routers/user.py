@@ -20,7 +20,7 @@ def get_user(
     user: models.User = Depends(deps.get_user)
 ):
     """Returns information of the authorized user"""
-    return user
+    return schemas.UserRead.from_orm(user)
 
 
 @router.patch('/', response_model=schemas.UserRead)

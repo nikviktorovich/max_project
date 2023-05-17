@@ -27,7 +27,7 @@ def get_cart_items(
     """Returns a list of authorized user's cart items"""
     repo = repositories.CartRepository(db)
     instances = repo.list(user_id=user.id)
-    return instances
+    return [schemas.CartItemRead.from_orm(instance) for instance in instances]
 
 
 @router.post(
@@ -81,7 +81,7 @@ def get_cart_item(
             detail='You are not an owner of this cart item',
         )
 
-    return cart_item
+    return schemas.CartItemRead.from_orm(cart_item)
 
 
 @router.put('/{cart_item_id}', response_model=schemas.CartItemRead)

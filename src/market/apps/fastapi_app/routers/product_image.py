@@ -30,7 +30,7 @@ def get_product_images(product_id: int, db: Session = Depends(deps.get_db)):
     """Returns list of product images filtered by specified product"""
     repo = repositories.ProductImageRepository(db)
     instances = repo.list(product_id=product_id)
-    return instances
+    return [schemas.ProductImageRead.from_orm(inst) for inst in instances]
 
 
 @router.post(
@@ -66,7 +66,7 @@ def add_product_image(
 def get_product_image(product_image_id: int, db: Session = Depends(deps.get_db)):
     repo = repositories.ProductImageRepository(db)
     instance = repo.get(product_image_id)
-    return instance
+    return schemas.ProductImageRead.from_orm(instance)
 
 
 @router.delete('/{product_image_id}', status_code=status.HTTP_204_NO_CONTENT)

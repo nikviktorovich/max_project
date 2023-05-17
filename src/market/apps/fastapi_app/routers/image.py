@@ -19,7 +19,7 @@ def get_image(image_id: int, db: Session = Depends(deps.get_db)):
     """Returns information of specified image"""
     repo = repositories.ImageRepository(db)
     instance = repo.get(image_id)
-    return instance
+    return schemas.ImageRead.from_orm(instance)
 
 
 @router.post(
@@ -29,4 +29,4 @@ def get_image(image_id: int, db: Session = Depends(deps.get_db)):
 )
 def add_image(image: models.Image = Depends(deps.save_image)):
     """Allows to upload an image"""
-    return image
+    return schemas.ImageRead.from_orm(image)

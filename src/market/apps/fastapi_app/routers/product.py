@@ -27,7 +27,8 @@ router = APIRouter(
 def get_products(db: Session = Depends(deps.get_db)):
     """Returns a list of products"""
     repo = repositories.ProductRepository(db)
-    return repo.list()
+    instances = repo.list()
+    return [schemas.ProductRead.from_orm(instance) for instance in instances]
 
 
 @router.post(
@@ -60,7 +61,7 @@ def get_product(product_id: int, db: Session = Depends(deps.get_db)):
     """Returns information of specified product"""
     repo = repositories.ProductRepository(db)
     instance = repo.get(product_id)
-    return instance
+    return schemas.ProductRead.from_orm(instance)
 
 
 @router.put('/{product_id}', response_model=schemas.ProductRead)
