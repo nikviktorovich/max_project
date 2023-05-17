@@ -25,7 +25,7 @@ def get_user(
 
 @router.patch('/', response_model=schemas.UserRead)
 def patch_username(
-    user_schema: schemas.UserFullnameUpdate,
+    user_schema: schemas.UserDataUpdate,
     user: models.User = Depends(deps.get_user),
 ):
     """Allows to edit (PATCH) the authorized user's information"""
@@ -42,7 +42,7 @@ def patch_username(
 
 @router.put('/', response_model=schemas.UserRead)
 def put_username(
-    user_schema: schemas.UserFullnamePut,
+    user_schema: schemas.UserDataPut,
     user: models.User = Depends(deps.get_user),
 ):
     """Allows to edit (PUT) the authorized user's information"""

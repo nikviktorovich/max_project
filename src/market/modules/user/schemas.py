@@ -46,9 +46,9 @@ class User(UserCreate):
     id: Optional[int] = None
 
 
-class UserFullnameUpdate(pydantic.BaseModel):
+class UserDataUpdate(pydantic.BaseModel):
     full_name: Optional[str] = None
 
 
-class UserFullnamePut(pydantic.BaseModel):
+class UserDataPut(pydantic.BaseModel):
     full_name: str = ''
