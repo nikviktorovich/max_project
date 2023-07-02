@@ -7,7 +7,7 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from .common import login
+from ..common import login
 
 
 @pytest.mark.usefixtures('client')
