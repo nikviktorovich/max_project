@@ -6,20 +6,19 @@ from typing import Dict
 from typing import Optional
 
 import passlib.context
-from fastapi import security
 from jose import jwt
 
 import market.config
 from market.modules.user.domain import models
 from market.modules.user import repositories
 
+from market.services.auth import abstract
+
 
 logger = logging.getLogger(__name__)
 
-oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl='token')
 
-
-class AuthService:
+class AuthServiceImpl(abstract.AuthService):
     pwd_context: passlib.context.CryptContext
     repo: repositories.UserRepository
 

@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from fastapi import security
 from fastapi import status
 
-import market.services
+import market.services.auth
 from market.apps.fastapi_app import deps
 from market.modules.user import schemas
 from market.services import unit_of_work
@@ -22,7 +22,7 @@ async def login(
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     """Authorizes user and returns an access token."""
-    auth_service = market.services.AuthService(uow.users)
+    auth_service = market.services.auth.AuthServiceImpl(uow.users)
     token = auth_service.login(form_data.username, form_data.password)
 
     if token is None:
@@ -41,7 +41,7 @@ async def signup(
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     """Allows user to sign up and returns an access token."""
-    auth_service = market.services.AuthService(uow.users)
+    auth_service = market.services.auth.AuthServiceImpl(uow.users)
 
     auth_service.register_user(
         user_id=uuid.uuid4(),

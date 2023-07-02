@@ -14,13 +14,14 @@ from fastapi import status
 
 import market.database
 import market.database.orm
-import market.services
+import market.services.auth
 import market.modules.image.domain.models
 import market.modules.image.repositories
 import market.modules.user.domain.models
 import market.modules.user.repositories
 import market.modules.user.schemas
 from market.services import unit_of_work
+from market.apps.fastapi_app import auth
 
 
 def get_uow() -> Iterator[unit_of_work.abstract.UnitOfWork]:
@@ -49,10 +50,10 @@ def get_user_create_form_data(
 
 
 def get_user(
-    token: str = Depends(market.services.oauth2_scheme),
+    token: str = Depends(auth.oauth2_scheme),
     uow: unit_of_work.UnitOfWork = Depends(get_uow),
 ) -> market.modules.user.domain.models.User:
-    auth_service = market.services.AuthService(uow.users)
+    auth_service = market.services.auth.AuthServiceImpl(uow.users)
     user = auth_service.get_user(token)
 
     if user is None:
