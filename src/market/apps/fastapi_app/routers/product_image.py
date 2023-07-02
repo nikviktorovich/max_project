@@ -5,6 +5,7 @@ from typing import List
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from fastapi import responses
 from fastapi import status
 
 import market.modules.user.domain.models
@@ -32,11 +33,7 @@ def get_product_images(
     return [schemas.ProductImageRead.from_orm(inst) for inst in instances]
 
 
-@router.post(
-    '/',
-    response_model=schemas.ProductImageRead,
-    status_code=status.HTTP_201_CREATED,
-)
+@router.post('/', response_model=schemas.ProductImageRead)
 def add_product_image(
     product_image_schema: schemas.ProductImageCreate,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
@@ -51,15 +48,19 @@ def add_product_image(
         )
     
     image_instance = uow.images.get(product_image_schema.image_id)
+    product_image_id = uuid.uuid4()
     product_image_instance = models.ProductImage(
-        id=uuid.uuid4(),
+        id=product_image_id,
         product_id=product_instance.id,
         image_id=image_instance.id,
     )
     uow.product_images.add(product_image_instance)
     uow.commit()
     
-    return schemas.ProductImageRead.from_orm(product_image_instance)
+    return responses.RedirectResponse(
+        url=f'/productimages/{product_image_id}',
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @router.get('/{product_image_id}', response_model=schemas.ProductImageRead)

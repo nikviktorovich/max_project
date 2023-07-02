@@ -14,7 +14,7 @@ from .common import login
 def upload_image(client: TestClient, path: str) -> Dict[str, Any]:
     with open(path, 'rb') as f:
         response = client.post('/images', files={'image': f})
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
 
     image = response.json()
     return image
@@ -33,7 +33,7 @@ def create_product(
         'price_rub': price_rub,
     }
     response = client.post('/products', json=product_data)
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
 
     product = response.json()
     return product
@@ -50,7 +50,7 @@ def create_product_image(
         'image_id': image_id,
     }
     response = client.post('/productimages', json=product_image_data)
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
 
     product_image = response.json()
     return product_image

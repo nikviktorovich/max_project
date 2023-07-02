@@ -5,8 +5,8 @@ from typing import List
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from fastapi import responses
 from fastapi import status
-from sqlalchemy.orm import Session
 
 import market.modules.user.domain.models
 from market.apps.fastapi_app import deps
@@ -30,19 +30,16 @@ def get_products(uow: unit_of_work.UnitOfWork = Depends(deps.get_uow)):
     return [schemas.ProductRead.from_orm(instance) for instance in instances]
 
 
-@router.post(
-    '/',
-    response_model=schemas.ProductRead,
-    status_code=status.HTTP_201_CREATED,
-)
+@router.post('/', response_model=schemas.ProductRead)
 def add_product(
     product_schema: schemas.ProductCreate,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     """Adds a product"""
+    product_id = uuid.uuid4()
     instance = models.Product(
-        id=uuid.uuid4(),
+        id=product_id,
         title=product_schema.title,
         description=product_schema.description,
         is_active=product_schema.is_active,
@@ -53,7 +50,10 @@ def add_product(
     added_instance = uow.products.add(instance)
     uow.commit()
 
-    return schemas.ProductRead.from_orm(added_instance)
+    return responses.RedirectResponse(
+        url=f'/products/{product_id}',
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @router.get('/{product_id}', response_model=schemas.ProductRead)
@@ -91,7 +91,10 @@ def put_product(
     updated_instance = uow.products.add(instance)
     uow.commit()
 
-    return schemas.ProductRead.from_orm(updated_instance)
+    return responses.RedirectResponse(
+        url=f'/products/{product_id}',
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @router.delete('/{product_id}', status_code=status.HTTP_204_NO_CONTENT)

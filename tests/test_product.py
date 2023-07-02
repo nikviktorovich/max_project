@@ -16,4 +16,4 @@ def test_product_create(client: TestClient):
         'price_rub': 100,
     }
     response = client.post('/products', json=product_data)
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK

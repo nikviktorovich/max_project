@@ -4,6 +4,7 @@ from typing import List
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from fastapi import responses
 from fastapi import status
 
 import market.modules.user.domain.models
@@ -28,19 +29,16 @@ def get_cart_items(
     return [schemas.CartItemRead.from_orm(instance) for instance in instances]
 
 
-@router.post(
-    '/',
-    response_model=schemas.CartItemRead,
-    status_code=status.HTTP_201_CREATED
-)
+@router.post('/', response_model=schemas.CartItemRead)
 def add_cart_item(
     cart_item_schema: schemas.CartItemCreate,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     """Adds an item to authorized user's cart"""
+    cart_item_id = uuid.uuid4()
     cart_item = models.CartItem(
-        id=uuid.uuid4(),
+        id=cart_item_id,
         amount=cart_item_schema.amount,
         user_id=user.id,
         product_id=cart_item_schema.product_id,
@@ -61,7 +59,10 @@ def add_cart_item(
     added_cart_item = uow.cart.add(cart_item)
     uow.commit()
 
-    return schemas.CartItemRead.from_orm(added_cart_item)
+    return responses.RedirectResponse(
+        url=f'/cart/{cart_item_id}',
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @router.get('/{cart_item_id}', response_model=schemas.CartItemRead)
@@ -104,7 +105,10 @@ def put_cart_item(
     updated_instance = uow.cart.add(instance)
     uow.commit()
     
-    return schemas.CartItemRead.from_orm(updated_instance)
+    return responses.RedirectResponse(
+        url=f'/cart/{cart_item_id}',
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @router.delete('/{cart_item_id}', status_code=status.HTTP_204_NO_CONTENT)

@@ -11,4 +11,4 @@ def test_upload(client: TestClient):
 
     with open('./tests/content/image_1.png', 'rb') as f:
         response = client.post('/images', files={'image': f})
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK

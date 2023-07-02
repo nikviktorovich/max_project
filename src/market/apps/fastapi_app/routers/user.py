@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import responses
+from fastapi import status
 
 from market.apps.fastapi_app import deps
 from market.modules.user import schemas
@@ -35,7 +37,7 @@ def patch_username(
 
     uow.commit()
     
-    return schemas.UserRead.from_orm(patched_user)
+    return responses.RedirectResponse('user/', status.HTTP_303_SEE_OTHER)
 
 
 @router.put('/', response_model=schemas.UserRead)
@@ -52,4 +54,4 @@ def put_username(
     
     uow.commit()
     
-    return schemas.UserRead.from_orm(updated_user)
+    return responses.RedirectResponse('user/', status.HTTP_303_SEE_OTHER)

@@ -2,6 +2,7 @@ import uuid
 
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import responses
 from fastapi import status
 
 from market.apps.fastapi_app import deps
@@ -25,11 +26,10 @@ def get_image(
     return schemas.ImageRead.from_orm(instance)
 
 
-@router.post(
-    '/',
-    response_model=schemas.ImageRead,
-    status_code=status.HTTP_201_CREATED
-)
+@router.post('/', response_model=schemas.ImageRead)
 def add_image(image: models.Image = Depends(deps.save_image)):
     """Allows to upload an image"""
-    return schemas.ImageRead.from_orm(image)
+    return responses.RedirectResponse(
+        url=f'/images/{image.id}',
+        status_code=status.HTTP_303_SEE_OTHER,
+    )

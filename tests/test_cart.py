@@ -23,7 +23,7 @@ def test_cart_create(client: TestClient):
         'stock': 10,
         'price_rub': 100.0,
     })
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
     product = response.json()
     product_id = product['id']
 
@@ -32,7 +32,7 @@ def test_cart_create(client: TestClient):
         'product_id': product_id,
         'amount': 2,
     })
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
 
     # Getting the created cart item
     response = client.get(f'/products/{product_id}')
@@ -49,7 +49,7 @@ def test_cart_collision(client: TestClient):
         'stock': 10,
         'price_rub': 100.0,
     })
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
     product = response.json()
     product_id = product['id']
 
@@ -58,7 +58,7 @@ def test_cart_collision(client: TestClient):
         'product_id': product_id,
         'amount': 10,
     })
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
 
     response = client.post('/cart', json={
         'product_id': product_id,
@@ -80,7 +80,7 @@ def test_cart_update(client: TestClient):
         'stock': 10,
         'price_rub': 100.0,
     })
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
     product = response.json()
 
     # Adding a test product in cart
@@ -90,7 +90,7 @@ def test_cart_update(client: TestClient):
     }
 
     response = client.post('/cart', json=cart_item_data)
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
     created_cart_item = response.json()
     created_cart_item_id = created_cart_item['id']
 
