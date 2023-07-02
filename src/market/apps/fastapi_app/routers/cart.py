@@ -1,3 +1,4 @@
+import uuid
 from typing import List
 
 from fastapi import APIRouter
@@ -39,6 +40,7 @@ def add_cart_item(
 ):
     """Adds an item to authorized user's cart"""
     cart_item = models.CartItem(
+        id=uuid.uuid4(),
         amount=cart_item_schema.amount,
         user_id=user.id,
         product_id=cart_item_schema.product_id,
@@ -64,7 +66,7 @@ def add_cart_item(
 
 @router.get('/{cart_item_id}', response_model=schemas.CartItemRead)
 def get_cart_item(
-    cart_item_id: int,
+    cart_item_id: uuid.UUID,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
@@ -82,7 +84,7 @@ def get_cart_item(
 
 @router.put('/{cart_item_id}', response_model=schemas.CartItemRead)
 def put_cart_item(
-    cart_item_id: int,
+    cart_item_id: uuid.UUID,
     cart_item_schema: schemas.CartItemUpdate,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
@@ -107,7 +109,7 @@ def put_cart_item(
 
 @router.delete('/{cart_item_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_cart_item(
-    cart_item_id: int,
+    cart_item_id: uuid.UUID,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):

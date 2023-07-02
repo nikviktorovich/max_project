@@ -1,26 +1,26 @@
 import dataclasses
-from typing import Any
+import uuid
 
 
 @dataclasses.dataclass
 class User:
+    id: uuid.UUID
     username: str
     password: str
-    id: Any = None
     full_name: str = ''
 
 
 @dataclasses.dataclass
 class Permission:
+    id: uuid.UUID
     name: str
     codename: str
-    id: Any = None
 
 
 @dataclasses.dataclass
 class Group:
+    id: uuid.UUID
     name: str
-    id: Any = None
 
 
 @dataclasses.dataclass

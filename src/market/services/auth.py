@@ -1,5 +1,6 @@
 import datetime
 import logging
+import uuid
 from typing import Any
 from typing import Dict
 from typing import Optional
@@ -131,6 +132,7 @@ class AuthService:
 
     def register_user(
         self,
+        user_id: uuid.UUID,
         username: str,
         password: str,
         full_name: str = '',
@@ -141,6 +143,7 @@ class AuthService:
             raise ValueError('Username is already taken')
         
         instance = models.User(
+            id=user_id,
             username=username,
             password=hashed_password,
             full_name=full_name,

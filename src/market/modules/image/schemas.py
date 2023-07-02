@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+import uuid
 from urllib.parse import urljoin
 
 import pydantic
@@ -14,7 +14,7 @@ class ImageCreate(ImageBase):
 
 
 class ImageRead(ImageBase):
-    id: int
+    id: uuid.UUID
 
     @pydantic.validator('image')
     def adjust_media_path(cls, v):
@@ -29,4 +29,4 @@ class ImageRead(ImageBase):
 
 
 class Image(ImageBase):
-    id: Optional[int] = None
+    id: uuid.UUID

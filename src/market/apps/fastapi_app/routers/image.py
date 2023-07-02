@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import status
@@ -15,7 +17,7 @@ router = APIRouter(
 
 @router.get('/{image_id}', response_model=schemas.ImageRead)
 def get_image(
-    image_id: int,
+    image_id: uuid.UUID,
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     """Returns information of specified image"""

@@ -1,3 +1,4 @@
+import uuid
 from typing import List, Optional
 
 from sqlalchemy import Column
@@ -39,7 +40,7 @@ group_permissions = Table(
 class User(market.database.orm.Base):
     __tablename__ = 'users'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(150), unique=True)
     full_name: Mapped[Optional[str]] = mapped_column(String(255))
     password: Mapped[str] = mapped_column(String(255))
@@ -50,7 +51,7 @@ class User(market.database.orm.Base):
 class Permission(market.database.orm.Base):
     __tablename__ = 'permissions'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255))
     codename: Mapped[str] = mapped_column(String(100))
 
@@ -58,6 +59,6 @@ class Permission(market.database.orm.Base):
 class Group(market.database.orm.Base):
     __tablename__ = 'groups'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(150))
     permissions: Mapped[List['Permission']] = relationship(secondary=group_permissions)

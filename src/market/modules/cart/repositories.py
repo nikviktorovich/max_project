@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -19,7 +20,7 @@ class CartRepository:
         self.session = session
     
 
-    def get(self, cart_item_id: int) -> models.CartItem:
+    def get(self, cart_item_id: uuid.UUID) -> models.CartItem:
         queryset = self.session.query(models.CartItem)
         queryset = queryset.filter_by(id=cart_item_id)
         instance = queryset.first()

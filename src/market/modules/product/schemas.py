@@ -1,5 +1,5 @@
+import uuid
 from datetime import datetime
-from typing import Optional
 
 import pydantic
 
@@ -25,10 +25,10 @@ class ProductCreate(ProductBase):
 
 
 class ProductRead(ProductBase):
-    id: int
+    id: uuid.UUID
     added: datetime
     last_updated: datetime
-    owner_id: int
+    owner_id: uuid.UUID
 
     class Config:
         orm_mode = True
@@ -39,7 +39,7 @@ class ProductPut(ProductCreate):
 
 
 class Product(ProductBase):
-    id: Optional[int] = None
+    id: uuid.UUID
     added: datetime
     last_updated: datetime
-    owner_id: int
+    owner_id: uuid.UUID

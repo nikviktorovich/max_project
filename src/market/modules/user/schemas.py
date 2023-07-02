@@ -1,5 +1,7 @@
-import pydantic
+import uuid
 from typing import Optional
+
+import pydantic
 
 
 class Token(pydantic.BaseModel):
@@ -43,7 +45,7 @@ class UserRead(UserBase):
 
 
 class User(UserCreate):
-    id: Optional[int] = None
+    id: uuid.UUID
 
 
 class UserDataUpdate(pydantic.BaseModel):

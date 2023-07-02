@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import List
 
 from fastapi import APIRouter
@@ -41,6 +42,7 @@ def add_product(
 ):
     """Adds a product"""
     instance = models.Product(
+        id=uuid.uuid4(),
         title=product_schema.title,
         description=product_schema.description,
         is_active=product_schema.is_active,
@@ -56,7 +58,7 @@ def add_product(
 
 @router.get('/{product_id}', response_model=schemas.ProductRead)
 def get_product(
-    product_id: int,
+    product_id: uuid.UUID,
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     """Returns information of specified product"""
@@ -66,7 +68,7 @@ def get_product(
 
 @router.put('/{product_id}', response_model=schemas.ProductRead)
 def put_product(
-    product_id: int,
+    product_id: uuid.UUID,
     product_scheme: schemas.ProductPut,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
@@ -94,7 +96,7 @@ def put_product(
 
 @router.delete('/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_product(
-    product_id: int,
+    product_id: uuid.UUID,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):

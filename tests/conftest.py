@@ -1,4 +1,5 @@
 import contextlib
+import uuid
 
 import fastapi.testclient
 import pytest
@@ -43,11 +44,13 @@ def filled_db():
         auth_service = market.services.AuthService(uow.users)
 
         test_user_1 = auth_service.register_user(
+            user_id=uuid.uuid4(),
             username='testuser1',
             password='testuser1',
             full_name='Some Test User',
         )
         test_user_2 = auth_service.register_user(
+            user_id=uuid.uuid4(),
             username='testuser2',
             password='testuser2',
             full_name='Another Test User',
@@ -58,6 +61,7 @@ def filled_db():
         
         # Adding 2 test products
         test_product_1 = market.modules.product.domain.models.Product(
+            id=uuid.uuid4(),
             title='Some test product',
             stock=10,
             price_rub=1000,
@@ -66,6 +70,7 @@ def filled_db():
         uow.products.add(test_product_1)
 
         test_product_2 = market.modules.product.domain.models.Product(
+            id=uuid.uuid4(),
             title='Another test product',
             stock=0,
             price_rub=100,

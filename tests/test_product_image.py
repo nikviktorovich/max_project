@@ -1,3 +1,4 @@
+import uuid
 from typing import Any
 from typing import Dict
 from typing import List
@@ -58,7 +59,7 @@ def create_product_image(
 @pytest.mark.usefixtures('client')
 def list_product_images(
     client: TestClient,
-    product_id: int,
+    product_id: uuid.UUID,
 ) -> List[Dict[str, Any]]:
     response = client.get(f'/productimages?product_id={product_id}')
     assert response.status_code == status.HTTP_200_OK

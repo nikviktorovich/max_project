@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -42,6 +44,7 @@ async def signup(
     auth_service = market.services.AuthService(uow.users)
 
     auth_service.register_user(
+        user_id=uuid.uuid4(),
         username=user_schema.username,
         password=user_schema.password,
         full_name=user_schema.full_name,

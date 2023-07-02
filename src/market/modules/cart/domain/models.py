@@ -1,10 +1,10 @@
 import dataclasses
-from typing import Any
+import uuid
 
 
 @dataclasses.dataclass
 class CartItem:
+    id: uuid.UUID
     amount: int
-    product_id: int
-    user_id: int
-    id: Any = None
+    product_id: uuid.UUID
+    user_id: uuid.UUID

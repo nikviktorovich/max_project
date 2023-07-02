@@ -1,9 +1,9 @@
 import dataclasses
-from typing import Any
+import uuid
 
 
 @dataclasses.dataclass
 class ProductImage:
-    product_id: int
-    image_id: int
-    id: Any = None
+    id: uuid.UUID
+    product_id: uuid.UUID
+    image_id: uuid.UUID

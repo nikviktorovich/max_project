@@ -1,16 +1,16 @@
 import dataclasses
+import uuid
 from datetime import datetime
-from typing import Any
 from typing import Optional
 
 
 @dataclasses.dataclass
 class Product:
+    id: uuid.UUID
     title: str
     stock: int
     price_rub: float
-    owner_id: int
-    id: Any = None
+    owner_id: uuid.UUID
     description: str = ''
     added: Optional[datetime] = None
     last_updated: Optional[datetime] = None

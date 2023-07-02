@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import ForeignKey
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped
@@ -19,9 +21,9 @@ class CartItem(market.database.orm.Base):
         ),
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, index=True)
     amount: Mapped[int] = mapped_column()
-    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'))
+    product_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('products.id'))
     product: Mapped[Product] = relationship(Product)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id'))
     user: Mapped[User] = relationship(User)

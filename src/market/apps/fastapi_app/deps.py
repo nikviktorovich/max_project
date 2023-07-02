@@ -1,8 +1,8 @@
 import logging
 import os
 import os.path
+import uuid
 from typing import Iterator
-from uuid import uuid4
 
 import pydantic
 from fastapi import Body
@@ -74,7 +74,7 @@ def get_available_media_filename(media_path: str, media_filename: str) -> str:
     new_media_filename = media_filename
 
     while os.path.exists(os.path.join(media_path, new_media_filename)):
-        new_media_filename = f'{uuid4().hex}_{media_filename}'
+        new_media_filename = f'{uuid.uuid4().hex}_{media_filename}'
     
     return new_media_filename
 
@@ -114,7 +114,10 @@ def save_image(
     image_filename: str = Depends(write_image),
     uow: unit_of_work.UnitOfWork = Depends(get_uow),
 ) -> market.modules.image.domain.models.Image:
-    instance = market.modules.image.domain.models.Image(image=image_filename)
+    instance = market.modules.image.domain.models.Image(
+        id=uuid.uuid4(),
+        image=image_filename,
+    )
     added_instance = uow.images.add(instance)
     uow.commit()
     return added_instance

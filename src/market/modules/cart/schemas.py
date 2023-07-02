@@ -1,9 +1,10 @@
+import uuid
+
 import pydantic
-from typing import Optional
 
 
 class CartItemBase(pydantic.BaseModel):
-    product_id: int
+    product_id: uuid.UUID
     amount: int
 
     @pydantic.validator('amount')
@@ -18,7 +19,7 @@ class CartItemCreate(CartItemBase):
 
 
 class CartItemRead(CartItemBase):
-    id: int
+    id: uuid.UUID
 
     class Config:
         orm_mode = True
@@ -29,5 +30,5 @@ class CartItemUpdate(CartItemBase):
 
 
 class CartItem(CartItemBase):
-    id: Optional[int] = None
-    user_id: int
+    id: uuid.UUID
+    user_id: uuid.UUID

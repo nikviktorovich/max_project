@@ -1,8 +1,8 @@
 import dataclasses
-from typing import Any
+import uuid
 
 
 @dataclasses.dataclass
 class Image:
+    id: uuid.UUID
     image: str
-    id: Any = None

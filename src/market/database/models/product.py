@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from typing import List
 
@@ -18,17 +19,17 @@ class ProductImage(market.database.orm.Base):
     
     __tablename__ = 'productimages'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'))
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    product_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('products.id'))
     product: Mapped['Product'] = relationship(back_populates='images')
-    image_id: Mapped[int] = mapped_column(ForeignKey('images.id'), unique=True)
+    image_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('images.id'), unique=True)
     image: Mapped['Image'] = relationship()
 
 
 class Product(market.database.orm.Base):
     __tablename__ = 'products'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str]
     stock: Mapped[int]
@@ -43,7 +44,7 @@ class Product(market.database.orm.Base):
         default=func.now(),
         onupdate=func.now()
     )
-    owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    owner_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id'))
     owner: Mapped['User'] = relationship()
     images: Mapped[List['ProductImage']] = relationship(
         back_populates='product',

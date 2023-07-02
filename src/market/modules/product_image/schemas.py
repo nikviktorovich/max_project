@@ -1,10 +1,11 @@
+import uuid
+
 import pydantic
-from typing import Optional
 
 
 class ProductImageBase(pydantic.BaseModel):
-    product_id: int
-    image_id: int
+    product_id: uuid.UUID
+    image_id: uuid.UUID
 
 
 class ProductImageCreate(ProductImageBase):
@@ -12,11 +13,11 @@ class ProductImageCreate(ProductImageBase):
 
 
 class ProductImageRead(ProductImageBase):
-    id: int
+    id: uuid.UUID
 
     class Config:
         orm_mode = True
 
 
 class ProductImage(ProductImageBase):
-    id: Optional[int] = None
+    id: uuid.UUID

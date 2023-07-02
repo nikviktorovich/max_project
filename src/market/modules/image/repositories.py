@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -19,7 +20,7 @@ class ImageRepository:
         self.session = session
     
 
-    def get(self, image_id: int) -> models.Image:
+    def get(self, image_id: uuid.UUID) -> models.Image:
         queryset = self.session.query(models.Image)
         queryset = queryset.filter_by(id=image_id)
         instance = queryset.first()

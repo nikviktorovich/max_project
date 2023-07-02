@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import List
 
 from fastapi import APIRouter
@@ -23,7 +24,7 @@ router = APIRouter(
 
 @router.get('/', response_model=List[schemas.ProductImageRead])
 def get_product_images(
-    product_id: int,
+    product_id: uuid.UUID,
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     """Returns list of product images filtered by specified product"""
@@ -51,6 +52,7 @@ def add_product_image(
     
     image_instance = uow.images.get(product_image_schema.image_id)
     product_image_instance = models.ProductImage(
+        id=uuid.uuid4(),
         product_id=product_instance.id,
         image_id=image_instance.id,
     )
@@ -62,7 +64,7 @@ def add_product_image(
 
 @router.get('/{product_image_id}', response_model=schemas.ProductImageRead)
 def get_product_image(
-    product_image_id: int,
+    product_image_id: uuid.UUID,
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     instance = uow.product_images.get(product_image_id)
@@ -71,7 +73,7 @@ def get_product_image(
 
 @router.delete('/{product_image_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_product_image(
-    product_image_id: int,
+    product_image_id: uuid.UUID,
     user: market.modules.user.domain.models.User = Depends(deps.get_user),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
