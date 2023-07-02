@@ -68,7 +68,7 @@ def list_product_images(
     return product_image_list
 
 
-@pytest.mark.usefixtures('clear_db', 'client')
+@pytest.mark.usefixtures('client')
 def test_create_product_with_images(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 

@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from .common import login
 
 
-@pytest.mark.usefixtures('clear_db', 'client')
+@pytest.mark.usefixtures('client')
 def test_cart_create(client: TestClient):
     # Checking for restriction of unauthorized access
     response = client.get('/cart')
@@ -39,7 +39,7 @@ def test_cart_create(client: TestClient):
     assert response.status_code == status.HTTP_200_OK
 
 
-@pytest.mark.usefixtures('clear_db', 'client')
+@pytest.mark.usefixtures('client')
 def test_cart_collision(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 
@@ -67,7 +67,7 @@ def test_cart_collision(client: TestClient):
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-@pytest.mark.usefixtures('clear_db', 'client')
+@pytest.mark.usefixtures('client')
 def test_cart_update(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 

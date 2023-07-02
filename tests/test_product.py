@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from .common import login
 
 
-@pytest.mark.usefixtures('clear_db', 'client')
+@pytest.mark.usefixtures('client')
 def test_product_create(client: TestClient):
     login(client, username='testuser1', password='testuser1')
 

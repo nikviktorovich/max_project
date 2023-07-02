@@ -20,9 +20,9 @@ market.database.mappers.start_mappers()
 
 @contextlib.asynccontextmanager
 async def app_lifespan(app: FastAPI):
-    market.database.orm.Base.metadata.create_all(
-        bind=market.config.get_database_engine(),
-    )
+    # market.database.orm.Base.metadata.create_all(
+    #     bind=market.config.get_database_engine(),
+    # )
     yield
 
 app = FastAPI(lifespan=app_lifespan)
