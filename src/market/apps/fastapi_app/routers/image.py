@@ -1,12 +1,11 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import status
-from sqlalchemy.orm import Session
 
 from market.apps.fastapi_app import deps
 from market.modules.image.domain import models
-from market.modules.image import repositories
 from market.modules.image import schemas
+from market.services import unit_of_work
 
 router = APIRouter(
     prefix='/images',
@@ -15,10 +14,12 @@ router = APIRouter(
 
 
 @router.get('/{image_id}', response_model=schemas.ImageRead)
-def get_image(image_id: int, db: Session = Depends(deps.get_db)):
+def get_image(
+    image_id: int,
+    uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
+):
     """Returns information of specified image"""
-    repo = repositories.ImageRepository(db)
-    instance = repo.get(image_id)
+    instance = uow.images.get(image_id)
     return schemas.ImageRead.from_orm(instance)
 
 

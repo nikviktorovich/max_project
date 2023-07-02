@@ -1,6 +1,7 @@
 import logging
 import os
 import os.path
+from typing import Iterator
 from uuid import uuid4
 
 import pydantic
@@ -10,7 +11,6 @@ from fastapi import HTTPException
 from fastapi import UploadFile
 from fastapi import security
 from fastapi import status
-from sqlalchemy.orm import Session
 
 import market.database
 import market.database.orm
@@ -20,14 +20,15 @@ import market.modules.image.repositories
 import market.modules.user.domain.models
 import market.modules.user.repositories
 import market.modules.user.schemas
+from market.services import unit_of_work
 
 
-def get_db():
-    db = market.database.orm.DEFAULT_SESSION_FACTORY()
-    try:
-        yield db
-    finally:
-        db.close()
+def get_uow() -> Iterator[unit_of_work.abstract.UnitOfWork]:
+    uow = unit_of_work.sqlalchemy.SQLAlchemyUnitOfWork(
+        market.database.orm.DEFAULT_SESSION_FACTORY,
+    )
+    with uow:
+        yield uow
 
 
 def get_user_create_form_data(
@@ -49,10 +50,9 @@ def get_user_create_form_data(
 
 def get_user(
     token: str = Depends(market.services.oauth2_scheme),
-    db: Session = Depends(get_db),
+    uow: unit_of_work.UnitOfWork = Depends(get_uow),
 ) -> market.modules.user.domain.models.User:
-    repo = market.modules.user.repositories.UserRepository(db)
-    auth_service = market.services.AuthService(repo)
+    auth_service = market.services.AuthService(uow.users)
     user = auth_service.get_user(token)
 
     if user is None:
@@ -112,10 +112,9 @@ def write_image(image: UploadFile) -> str:
 
 def save_image(
     image_filename: str = Depends(write_image),
-    db: Session = Depends(get_db)
+    uow: unit_of_work.UnitOfWork = Depends(get_uow),
 ) -> market.modules.image.domain.models.Image:
-    repo = market.modules.image.repositories.ImageRepository(db)
     instance = market.modules.image.domain.models.Image(image=image_filename)
-    added_instance = repo.add(instance)
-    db.commit()
+    added_instance = uow.images.add(instance)
+    uow.commit()
     return added_instance
