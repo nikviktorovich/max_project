@@ -10,12 +10,12 @@ import market.apps.fastapi_app.routers
 import market.common.errors
 import market.config
 import market.database.orm
-import market.mappers
+import market.database.mappers
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
-market.mappers.start_mappers()
+market.database.mappers.start_mappers()
 
 
 @contextlib.asynccontextmanager
