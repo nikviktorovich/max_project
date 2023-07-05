@@ -48,7 +48,7 @@ app.add_middleware(
 def global_exception_handler(request, exception):
     message = f"Failed to execute: {request.method}: {request.url}. Error: {exception}"
     logger.error(message)
-    return responses.JSONResponse(
+    return responses.ORJSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={'detail': 'Server error'}
     )
@@ -56,7 +56,7 @@ def global_exception_handler(request, exception):
 
 @app.exception_handler(ValueError)
 def value_error_handler(request, exception):
-    return responses.JSONResponse(
+    return responses.ORJSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={'detail': str(exception)},
     )
@@ -64,7 +64,7 @@ def value_error_handler(request, exception):
 
 @app.exception_handler(market.common.errors.NotFoundError)
 def not_found_error_handler(request, exception):
-    return responses.JSONResponse(
+    return responses.ORJSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content={'detail': str(exception)},
     )
