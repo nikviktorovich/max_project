@@ -20,12 +20,13 @@ idna==3.4
 iniconfig==2.0.0
 itsdangerous==2.1.2
 Jinja2==3.1.2
--e git+https://github.com/nikviktorovich/max_project.git@eb235924d451c36477963dfbcaa409bc50460e2c#egg=market&subdirectory=src
+-e git+https://github.com/nikviktorovich/max_project.git@6e1f46683075fbf814b1f44837d31c9c0f6656b7#egg=market&subdirectory=src
 MarkupSafe==2.1.2
 orjson==3.8.6
 packaging==23.0
 passlib==1.7.4
 pluggy==1.0.0
+psycopg2==2.9.6
 pyasn1==0.4.8
 pycparser==2.21
 pydantic==1.10.4
