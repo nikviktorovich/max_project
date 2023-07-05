@@ -49,4 +49,11 @@ class CartRepository:
 
     def delete(self, cart_item: models.CartItem) -> None:
         self.session.delete(cart_item)
+    
+
+    def update(self, cart_item: models.CartItem, **fields) -> models.CartItem:
+        for attribute, value in fields.items():
+            setattr(cart_item, attribute, value)
+        
+        return cart_item
 

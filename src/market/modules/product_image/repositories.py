@@ -52,3 +52,14 @@ class ProductImageRepository:
 
     def delete(self, product_image: models.ProductImage) -> None:
         self.session.delete(product_image)
+    
+
+    def update(
+        self,
+        product_image: models.ProductImage,
+        **fields,
+    ) -> models.ProductImage:
+        for attribute, value in fields.items():
+            setattr(product_image, attribute, value)
+        
+        return product_image

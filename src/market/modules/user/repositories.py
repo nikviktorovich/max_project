@@ -49,3 +49,10 @@ class UserRepository:
 
     def delete(self, user: models.User) -> None:
         self.session.delete(user)
+    
+
+    def update(self, user: models.User, **fields) -> models.User:
+        for attribute, value in fields.items():
+            setattr(user, attribute, value)
+        
+        return user

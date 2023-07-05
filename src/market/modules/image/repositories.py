@@ -49,3 +49,10 @@ class ImageRepository:
 
     def delete(self, image: models.Image) -> None:
         self.session.delete(image)
+    
+
+    def update(self, image: models.Image, **fields) -> models.Image:
+        for attribute, value in fields.items():
+            setattr(image, attribute, value)
+        
+        return image

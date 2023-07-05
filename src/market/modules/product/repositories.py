@@ -49,3 +49,10 @@ class ProductRepository:
 
     def delete(self, product: models.Product) -> None:
         self.session.delete(product)
+    
+
+    def update(self, product: models.Product, **fields) -> models.Product:
+        for attribute, value in fields.items():
+            setattr(product, attribute, value)
+        
+        return product
