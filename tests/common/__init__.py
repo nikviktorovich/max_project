@@ -1,3 +1,4 @@
+from .auth import LightAuthService
 from .auth import TokenAuth
 from .repositories import FakeRepository
 from .repositories import FakeCartRepository

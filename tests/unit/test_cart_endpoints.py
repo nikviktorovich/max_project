@@ -15,7 +15,7 @@ from .. import common
 
 
 def create_test_user(username: str, repo: common.FakeUserRepository):
-    auth_service = market.services.auth.AuthServiceImpl(repo) # type: ignore
+    auth_service = common.LightAuthService(repo) # type: ignore
     user = auth_service.register_user(uuid.uuid4(), username, 'testuser')
     token = auth_service.login(username, 'testuser')
     assert token is not None
@@ -38,7 +38,7 @@ def create_test_product(owner_id: uuid.UUID):
 
 @pytest.mark.usefixtures('app', 'client')
 def test_cart_endpoint_get_cart_items_authorized(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -59,7 +59,7 @@ def test_cart_endpoint_get_cart_items_authorized(
         products=product_repo,
         cart=cart_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get('/cart', auth=auth)
     assert response.status_code == status.HTTP_200_OK
@@ -68,7 +68,7 @@ def test_cart_endpoint_get_cart_items_authorized(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_cart_endpoint_get_cart_items_unauthorized(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -82,7 +82,7 @@ def test_cart_endpoint_get_cart_items_unauthorized(
         products=product_repo,
         cart=cart_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get('/cart')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -90,7 +90,7 @@ def test_cart_endpoint_get_cart_items_unauthorized(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_cart_endpoint_add_cart_item_success(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -104,7 +104,7 @@ def test_cart_endpoint_add_cart_item_success(
         products=product_repo,
         cart=cart_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.post('/cart', auth=auth, json={
         'product_id': str(product.id),
@@ -115,7 +115,7 @@ def test_cart_endpoint_add_cart_item_success(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_cart_endpoint_add_cart_item_failure(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -129,7 +129,7 @@ def test_cart_endpoint_add_cart_item_failure(
         products=product_repo,
         cart=cart_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     # Adding a product to the cart
     response = client.post('/cart', auth=auth, json={
@@ -147,7 +147,7 @@ def test_cart_endpoint_add_cart_item_failure(
 
 
 def test_cart_endpoint_get_cart_item_by_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -168,7 +168,7 @@ def test_cart_endpoint_get_cart_item_by_owner(
         products=product_repo,
         cart=cart_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get(f'/cart/{cart_item.id}', auth=auth)
     assert response.status_code == status.HTTP_200_OK
@@ -176,7 +176,7 @@ def test_cart_endpoint_get_cart_item_by_owner(
 
 
 def test_cart_endpoint_get_cart_item_not_by_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -198,14 +198,14 @@ def test_cart_endpoint_get_cart_item_not_by_owner(
         products=product_repo,
         cart=cart_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get(f'/cart/{cart_item.id}', auth=not_owner_auth)
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_cart_endpoint_put_cart_item_by_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -226,7 +226,7 @@ def test_cart_endpoint_put_cart_item_by_owner(
         products=product_repo,
         cart=cart_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.put(f'/cart/{cart_item.id}', auth=owner_auth, json={
         'product_id': str(product.id),

@@ -2,6 +2,7 @@ import logging
 import os
 import os.path
 import uuid
+from typing import Callable
 from typing import Iterator
 from typing import Optional
 
@@ -29,11 +30,22 @@ def get_uow() -> Iterator[unit_of_work.abstract.UnitOfWork]:
         yield uow
 
 
+AuthServiceFactory = Callable[
+    [market.modules.user.repositories.UserRepository],
+    market.services.auth.AuthService
+]
+
+
+def get_auth_service_factory() -> AuthServiceFactory:
+    return lambda repo: market.services.auth.AuthServiceImpl(repo)
+
+
 def get_user(
     token: str = Depends(auth.oauth2_scheme),
+    auth_service_factory: AuthServiceFactory = Depends(get_auth_service_factory),
     uow: unit_of_work.UnitOfWork = Depends(get_uow),
 ) -> market.modules.user.domain.models.User:
-    auth_service = market.services.auth.AuthServiceImpl(uow.users)
+    auth_service = auth_service_factory(uow.users)
     user = auth_service.get_user(token)
 
     if user is None:

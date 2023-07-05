@@ -15,7 +15,7 @@ from .. import common
 
 
 def create_test_user(username: str, repo: common.FakeUserRepository):
-    auth_service = market.services.auth.AuthServiceImpl(repo) # type: ignore
+    auth_service = common.LightAuthService(repo) # type: ignore
     user = auth_service.register_user(uuid.uuid4(), username, 'testuser')
     token = auth_service.login(username, 'testuser')
     assert token is not None
@@ -38,7 +38,7 @@ def create_test_product(owner_id: uuid.UUID):
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_list_products(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -47,7 +47,7 @@ def test_product_endpoint_list_products(
     product = create_test_product(user.id)
     product_repo = common.FakeProductRepository([product])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get('/products')
     assert response.status_code == status.HTTP_200_OK
@@ -56,7 +56,7 @@ def test_product_endpoint_list_products(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_add_product_authorized(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -64,7 +64,7 @@ def test_product_endpoint_add_product_authorized(
 
     product_repo = common.FakeProductRepository([])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.post('/products', auth=auth, json={
         'title': 'Some title',
@@ -78,13 +78,13 @@ def test_product_endpoint_add_product_authorized(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_add_product_unauthorized(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
     product_repo = common.FakeProductRepository([])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.post('/products', json={
         'title': 'Some title',
@@ -98,7 +98,7 @@ def test_product_endpoint_add_product_unauthorized(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_get_existing_product(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -107,7 +107,7 @@ def test_product_endpoint_get_existing_product(
     product = create_test_product(owner.id)
     product_repo = common.FakeProductRepository([product])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get(f'/products/{product.id}')
     assert response.status_code == status.HTTP_200_OK
@@ -116,13 +116,13 @@ def test_product_endpoint_get_existing_product(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_get_nonexisting_product(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
     product_repo = common.FakeProductRepository([])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get(f'/products/{uuid.uuid4()}')
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -130,7 +130,7 @@ def test_product_endpoint_get_nonexisting_product(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_put_product_unauthorized(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -139,7 +139,7 @@ def test_product_endpoint_put_product_unauthorized(
     product = create_test_product(user.id)
     product_repo = common.FakeProductRepository([product])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     old_stock = product.stock
     response = client.put(f'/products/{product.id}', json={
@@ -154,7 +154,7 @@ def test_product_endpoint_put_product_unauthorized(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_put_product_authorized_as_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -163,7 +163,7 @@ def test_product_endpoint_put_product_authorized_as_owner(
     product = create_test_product(owner.id)
     product_repo = common.FakeProductRepository([product])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     old_stock = product.stock
     response = client.put(f'/products/{product.id}', auth=owner_auth, json={
@@ -178,7 +178,7 @@ def test_product_endpoint_put_product_authorized_as_owner(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_put_product_authorized_as_not_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -188,7 +188,7 @@ def test_product_endpoint_put_product_authorized_as_not_owner(
     product = create_test_product(owner.id)
     product_repo = common.FakeProductRepository([product])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     old_stock = product.stock
     response = client.put(f'/products/{product.id}', auth=not_owner_auth, json={
@@ -203,7 +203,7 @@ def test_product_endpoint_put_product_authorized_as_not_owner(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_delete_product_unauthorized(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -212,7 +212,7 @@ def test_product_endpoint_delete_product_unauthorized(
     product = create_test_product(owner.id)
     product_repo = common.FakeProductRepository([product])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.delete(f'/products/{product.id}')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -221,7 +221,7 @@ def test_product_endpoint_delete_product_unauthorized(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_delete_product_authorized_as_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -230,7 +230,7 @@ def test_product_endpoint_delete_product_authorized_as_owner(
     product = create_test_product(owner.id)
     product_repo = common.FakeProductRepository([product])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.delete(f'/products/{product.id}', auth=owner_auth)
     assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -239,7 +239,7 @@ def test_product_endpoint_delete_product_authorized_as_owner(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_endpoint_delete_product_authorized_as_not_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -249,7 +249,7 @@ def test_product_endpoint_delete_product_authorized_as_not_owner(
     product = create_test_product(owner.id)
     product_repo = common.FakeProductRepository([product])
     uow = common.FakeUnitOfWork(users=user_repo, products=product_repo)
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.delete(f'/products/{product.id}', auth=not_owner_auth)
     assert response.status_code == status.HTTP_403_FORBIDDEN

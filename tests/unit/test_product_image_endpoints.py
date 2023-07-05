@@ -17,7 +17,7 @@ from .. import common
 
 
 def create_test_user(username: str, repo: common.FakeUserRepository):
-    auth_service = market.services.auth.AuthServiceImpl(repo) # type: ignore
+    auth_service = common.LightAuthService(repo) # type: ignore
     user = auth_service.register_user(uuid.uuid4(), username, 'testuser')
     token = auth_service.login(username, 'testuser')
     assert token is not None
@@ -40,7 +40,7 @@ def create_test_product(owner_id: uuid.UUID):
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_list_product_images(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -72,7 +72,7 @@ def test_product_image_endpoint_list_product_images(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get(f'/productimages?product_id={product_with_images.id}')
     assert response.status_code == status.HTTP_200_OK
@@ -89,7 +89,7 @@ def test_product_image_endpoint_list_product_images(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_add_product_image_unauthorized(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -111,7 +111,7 @@ def test_product_image_endpoint_add_product_image_unauthorized(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.post('/productimages', json={
         'product_id': str(product.id),
@@ -123,7 +123,7 @@ def test_product_image_endpoint_add_product_image_unauthorized(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_add_product_image_as_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -145,7 +145,7 @@ def test_product_image_endpoint_add_product_image_as_owner(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.post('/productimages', auth=owner_auth, json={
         'product_id': str(product.id),
@@ -157,7 +157,7 @@ def test_product_image_endpoint_add_product_image_as_owner(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_add_product_image_as_not_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -180,7 +180,7 @@ def test_product_image_endpoint_add_product_image_as_not_owner(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.post('/productimages', auth=not_owner_auth, json={
         'product_id': str(product.id),
@@ -192,7 +192,7 @@ def test_product_image_endpoint_add_product_image_as_not_owner(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_add_product_image_nonexisting_image(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -209,7 +209,7 @@ def test_product_image_endpoint_add_product_image_nonexisting_image(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.post('/productimages', auth=owner_auth, json={
         'product_id': str(product.id),
@@ -220,7 +220,7 @@ def test_product_image_endpoint_add_product_image_nonexisting_image(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_add_product_image_nonexisting_product(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -241,7 +241,7 @@ def test_product_image_endpoint_add_product_image_nonexisting_product(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.post('/productimages', auth=owner_auth, json={
         'product_id': str(uuid.uuid4()),
@@ -252,7 +252,7 @@ def test_product_image_endpoint_add_product_image_nonexisting_product(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_get_existing_product_image(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -279,7 +279,7 @@ def test_product_image_endpoint_get_existing_product_image(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get(f'/productimages/{product_image.id}')
     assert response.status_code == status.HTTP_200_OK
@@ -287,7 +287,7 @@ def test_product_image_endpoint_get_existing_product_image(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_get_nonexisting_product_image(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -308,7 +308,7 @@ def test_product_image_endpoint_get_nonexisting_product_image(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.get(f'/productimages/{uuid.uuid4()}')
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -316,7 +316,7 @@ def test_product_image_endpoint_get_nonexisting_product_image(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_delete_product_image_unauthorized(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -343,7 +343,7 @@ def test_product_image_endpoint_delete_product_image_unauthorized(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.delete(f'/productimages/{product_image.id}')
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -352,7 +352,7 @@ def test_product_image_endpoint_delete_product_image_unauthorized(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_delete_product_image_as_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -379,7 +379,7 @@ def test_product_image_endpoint_delete_product_image_as_owner(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.delete(f'/productimages/{product_image.id}', auth=owner_auth)
     assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -388,7 +388,7 @@ def test_product_image_endpoint_delete_product_image_as_owner(
 
 @pytest.mark.usefixtures('app', 'client')
 def test_product_image_endpoint_delete_product_image_as_not_owner(
-    app: fastapi.FastAPI,
+    lw_app: fastapi.FastAPI,
     client: testclient.TestClient,
 ):
     user_repo = common.FakeUserRepository([])
@@ -416,7 +416,7 @@ def test_product_image_endpoint_delete_product_image_as_not_owner(
         images=images_repo,
         product_images=product_images_repo,
     )
-    app.dependency_overrides[deps.get_uow] = lambda: uow
+    lw_app.dependency_overrides[deps.get_uow] = lambda: uow
 
     response = client.delete(
         f'/productimages/{product_image.id}',

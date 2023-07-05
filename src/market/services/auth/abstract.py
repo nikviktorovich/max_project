@@ -25,6 +25,13 @@ class AuthService:
         ...
     
 
+    def get_user(
+        self,
+        token: str,
+    ) -> Optional[models.User]:
+        ...
+
+
     def register_user(
         self,
         user_id: uuid.UUID,
