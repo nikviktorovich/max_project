@@ -9,7 +9,7 @@ from fastapi import status
 
 import market.modules.user.domain.models
 from market.apps.fastapi_app import deps
-from market.modules.cart import schemas
+from market.apps.fastapi_app.routers.cart import schemas
 from market.modules.cart.domain import models
 from market.services import unit_of_work
 
@@ -99,10 +99,11 @@ def put_cart_item(
             detail='You are not an owner of this cart item',
         )
 
-    instance.amount = cart_item_schema.amount
-    instance.product_id = cart_item_schema.product_id
-
-    updated_instance = uow.cart.add(instance)
+    updated_instance = uow.cart.update(
+        instance,
+        amount = cart_item_schema.amount,
+        product_id = cart_item_schema.product_id,
+    )
     uow.commit()
     
     return responses.RedirectResponse(

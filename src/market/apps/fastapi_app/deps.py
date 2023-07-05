@@ -3,13 +3,11 @@ import os
 import os.path
 import uuid
 from typing import Iterator
+from typing import Optional
 
-import pydantic
-from fastapi import Body
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import UploadFile
-from fastapi import security
 from fastapi import status
 
 import market.database
@@ -19,7 +17,6 @@ import market.modules.image.domain.models
 import market.modules.image.repositories
 import market.modules.user.domain.models
 import market.modules.user.repositories
-import market.modules.user.schemas
 from market.services import unit_of_work
 from market.apps.fastapi_app import auth
 
@@ -30,23 +27,6 @@ def get_uow() -> Iterator[unit_of_work.abstract.UnitOfWork]:
     )
     with uow:
         yield uow
-
-
-def get_user_create_form_data(
-    form_data: security.OAuth2PasswordRequestForm = Depends(),
-    full_name: str = Body(default=''),
-) -> market.modules.user.schemas.UserCreate:
-    try:
-        return market.modules.user.schemas.UserCreate(
-            username=form_data.username,
-            password=form_data.password,
-            full_name=full_name,
-        )
-    except pydantic.ValidationError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=e.errors()
-        )
 
 
 def get_user(
@@ -80,10 +60,15 @@ def get_available_media_filename(media_path: str, media_filename: str) -> str:
     return new_media_filename
 
 
-def write_image(image: UploadFile) -> str:
+def get_media_path() -> Optional[str]:
+    return os.getenv('MEDIA_PATH')
+
+
+def write_image(
+    image: UploadFile,
+    media_path: str = Depends(get_media_path),
+) -> str:
     """Writes uploaded image into a file in a media folder"""
-    media_path = os.getenv('MEDIA_PATH')
-    
     if media_path is None:
         raise RuntimeError('MEDIA_PATH is not specified')
     

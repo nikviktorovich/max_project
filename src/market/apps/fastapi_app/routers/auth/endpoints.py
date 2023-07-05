@@ -1,6 +1,8 @@
 import uuid
 
+import pydantic
 from fastapi import APIRouter
+from fastapi import Body
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import security
@@ -8,11 +10,11 @@ from fastapi import status
 
 import market.services.auth
 from market.apps.fastapi_app import deps
-from market.modules.user import schemas
+from market.apps.fastapi_app.routers.auth import schemas
 from market.services import unit_of_work
 
 router = APIRouter(
-    tags=['auth']
+    tags=['auth'],
 )
 
 
@@ -35,9 +37,26 @@ async def login(
     return schemas.Token.from_orm(token)
 
 
+def get_user_create_form_data(
+    form_data: security.OAuth2PasswordRequestForm = Depends(),
+    full_name: str = Body(default=''),
+) -> schemas.UserCreate:
+    try:
+        return schemas.UserCreate(
+            username=form_data.username,
+            password=form_data.password,
+            full_name=full_name,
+        )
+    except pydantic.ValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.errors()
+        )
+
+
 @router.post('/signup', response_model=schemas.Token)
 async def signup(
-    user_schema: schemas.UserCreate = Depends(deps.get_user_create_form_data),
+    user_schema: schemas.UserCreate = Depends(get_user_create_form_data),
     uow: unit_of_work.UnitOfWork = Depends(deps.get_uow),
 ):
     """Allows user to sign up and returns an access token."""

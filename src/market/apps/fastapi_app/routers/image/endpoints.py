@@ -6,8 +6,8 @@ from fastapi import responses
 from fastapi import status
 
 from market.apps.fastapi_app import deps
+from market.apps.fastapi_app.routers.image import schemas
 from market.modules.image.domain import models
-from market.modules.image import schemas
 from market.services import unit_of_work
 
 router = APIRouter(

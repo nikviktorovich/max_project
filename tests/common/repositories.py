@@ -32,9 +32,13 @@ class FakeRepository(Generic[T]):
     def list(self, **filters) -> List[T]:
         filtered_items = []
         for item in self.items.values():
-            for k, v in filters.items():
-                if getattr(item, k) == v:
-                    filtered_items.append(item)
+            if not filters:
+                filtered_items.append(item)
+                continue
+            
+            if all(getattr(item, k) == v for k, v in filters.items()):
+                filtered_items.append(item)
+
         return filtered_items
     
 
@@ -48,6 +52,11 @@ class FakeRepository(Generic[T]):
     
 
     def add(self, item: T) -> T:
+        if item.id in self.items: # type: ignore
+            raise errors.AlreadyExistsError(
+                f'Item with id={item.id} already exists', # type: ignore
+            )
+
         self.items[item.id] = item # type: ignore
         return item
     
@@ -59,6 +68,13 @@ class FakeRepository(Generic[T]):
             )
 
         del self.items[item.id] # type: ignore
+    
+
+    def update(self, item: T, **fields) -> T:
+        for field, value in fields.items():
+            setattr(item, field, value)
+        
+        return item
 
 
 class FakeCartRepository(FakeRepository[market.modules.cart.domain.models.CartItem]):

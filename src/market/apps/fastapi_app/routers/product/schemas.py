@@ -5,7 +5,7 @@ import pydantic
 
 
 class ProductBase(pydantic.BaseModel):
-    title: str
+    title: str = pydantic.Field(min_length=8, max_length=255)
     description: str = ''
     stock: int
     price_rub: float
@@ -13,15 +13,7 @@ class ProductBase(pydantic.BaseModel):
 
 
 class ProductCreate(ProductBase):
-    @pydantic.validator('title')
-    def title_valid_length(cls, v):
-        if len(v) < 8:
-            raise ValueError('Title must be at least 8 characters long')
-        
-        if len(v) > 255:
-            raise ValueError('Title is too long')
-        
-        return v
+    pass
 
 
 class ProductRead(ProductBase):
@@ -36,10 +28,3 @@ class ProductRead(ProductBase):
 
 class ProductPut(ProductCreate):
     pass
-
-
-class Product(ProductBase):
-    id: uuid.UUID
-    added: datetime
-    last_updated: datetime
-    owner_id: uuid.UUID

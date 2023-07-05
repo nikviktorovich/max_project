@@ -10,7 +10,7 @@ from fastapi import status
 
 import market.modules.user.domain.models
 from market.apps.fastapi_app import deps
-from market.modules.product import schemas
+from market.apps.fastapi_app.routers.product import schemas
 from market.modules.product.domain import models
 from market.services import unit_of_work
 
@@ -82,13 +82,14 @@ def put_product(
             detail='You are not the product owner',
         )
 
-    instance.title = product_scheme.title
-    instance.description = product_scheme.description
-    instance.stock = product_scheme.stock
-    instance.price_rub = product_scheme.price_rub
-    instance.is_active = product_scheme.is_active
-
-    updated_instance = uow.products.add(instance)
+    updated_instance = uow.products.update(
+        instance,
+        title = product_scheme.title,
+        description = product_scheme.description,
+        stock = product_scheme.stock,
+        price_rub = product_scheme.price_rub,
+        is_active = product_scheme.is_active,
+    )
     uow.commit()
 
     return responses.RedirectResponse(

@@ -17,7 +17,3 @@ class ProductImageRead(ProductImageBase):
 
     class Config:
         orm_mode = True
-
-
-class ProductImage(ProductImageBase):
-    id: uuid.UUID

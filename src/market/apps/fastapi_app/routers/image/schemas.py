@@ -26,7 +26,3 @@ class ImageRead(ImageBase):
     
     class Config:
         orm_mode = True
-
-
-class Image(ImageBase):
-    id: uuid.UUID

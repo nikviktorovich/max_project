@@ -10,7 +10,7 @@ from fastapi import status
 
 import market.modules.user.domain.models
 from market.apps.fastapi_app import deps
-from market.modules.product_image import schemas
+from market.apps.fastapi_app.routers.product_image import schemas
 from market.modules.product_image.domain import models
 from market.services import unit_of_work
 
@@ -43,7 +43,7 @@ def add_product_image(
 
     if product_instance.owner_id != user.id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail='You are not the product owner',
         )
     
