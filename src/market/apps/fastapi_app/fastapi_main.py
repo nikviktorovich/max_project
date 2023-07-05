@@ -25,7 +25,10 @@ async def app_lifespan(app: FastAPI):
     )
     yield
 
-app = FastAPI(lifespan=app_lifespan)
+app = FastAPI(
+    lifespan=app_lifespan,
+    default_response_class=responses.ORJSONResponse,
+)
 
 # CORS configuration
 origins = [
